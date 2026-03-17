@@ -1,0 +1,21 @@
+{
+	"name": "ds_adls_landing_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_landing",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "historical_test.json",
+				"folderPath": "raw/arbetsformedlingen_historical",
+				"fileSystem": "landing"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
