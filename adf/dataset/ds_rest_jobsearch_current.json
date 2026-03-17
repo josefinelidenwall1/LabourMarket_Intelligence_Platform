@@ -5,10 +5,18 @@
 			"referenceName": "ls_rest_jobsearch_current",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"relativeUrl": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
-			"relativeUrl": "/search?q=data&limit=5"
+			"relativeUrl": {
+				"value": "@dataset().relativeUrl",
+				"type": "Expression"
+			}
 		},
 		"schema": []
 	},
