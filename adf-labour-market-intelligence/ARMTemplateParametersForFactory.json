@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-labour-market-intelligence"
+		},
+		"ls_adls_landing_accountKey": {
+			"value": ""
+		},
+		"ls_adls_landing_properties_typeProperties_url": {
+			"value": "https://adlmlabourmarket.dfs.core.windows.net/"
+		},
+		"ls_rest_jobsearch_current_properties_typeProperties_url": {
+			"value": "https://jobsearch.api.jobtechdev.se"
+		},
+		"ls_rest_jobsearch_historical_properties_typeProperties_url": {
+			"value": "https://historical.api.jobtechdev.se"
+		}
+	}
+}
