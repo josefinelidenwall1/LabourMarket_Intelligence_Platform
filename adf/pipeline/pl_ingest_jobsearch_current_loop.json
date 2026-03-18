@@ -1,6 +1,85 @@
 {
 	"name": "pl_ingest_jobsearch_current_loop",
 	"properties": {
+		"activities": [
+			{
+				"name": "until_fetch_pages",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(variables('v_page_num'), pipeline().parameters.p_max_pages)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "copy_current_jobsearch_page",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_jobsearch_current",
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": {
+											"value": "@concat('/search?q=', pipeline().parameters.p_query, '&limit=', string(pipeline().parameters.p_limit), '&offset=', string(variables('v_offset')))",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_landing_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"dirPath": {
+											"value": "@pipeline().parameters.p_target_folder",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@concat('page_', string(variables('v_page_num')), '.json')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
 		"parameters": {
 			"p_query": {
 				"type": "string",
