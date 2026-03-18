@@ -27,12 +27,14 @@
 						}
 					},
 					"sink": {
-						"type": "JsonSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "JsonWriteSettings"
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false
@@ -45,7 +47,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "adls_yh_region",
+						"referenceName": "adls_yh_region_csv",
 						"type": "DatasetReference"
 					}
 				]
