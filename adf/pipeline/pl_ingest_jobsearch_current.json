@@ -1,0 +1,70 @@
+{
+	"name": "pl_ingest_jobsearch_current",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy_jobsearch_current_to_landing",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_rest_jobsearch_current",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_landing_json",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"p_query": {
+				"type": "string",
+				"defaultValue": "data"
+			},
+			"p_limit": {
+				"type": "int",
+				"defaultValue": 100
+			},
+			"p_target_folder": {
+				"type": "string",
+				"defaultValue": "raw/arbetsformedlingen_current"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-03-17T12:45:07Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
