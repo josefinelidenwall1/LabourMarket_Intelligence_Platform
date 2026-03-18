@@ -1,0 +1,18 @@
+{
+	"name": "http_yh_inriktning",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Http_yh_inriktning",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			},
+			"encodingName": "ISO-8859-1"
+		},
+		"schema": {}
+	}
+}
