@@ -1,5 +1,5 @@
 {
-	"name": "pl_ingest_jobsearch_current_loop",
+	"name": "pl_ingest_jobsearch_current_loop_test",
 	"properties": {
 		"activities": [
 			{
@@ -9,161 +9,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(variables('v_has_more'), false)",
+						"value": "@greater(variables('v_page_num'), pipeline().parameters.p_max_pages)",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "set_next_offset",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "set_has_more",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "v_next_offset",
-								"value": {
-									"value": "@add(variables('v_offset'), pipeline().parameters.p_limit)",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "set_offset",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "set_next_offset",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "v_offset",
-								"value": {
-									"value": "@variables('v_next_offset')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "set_next_page_num",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "set_offset",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "v_next_page_num",
-								"value": {
-									"value": "@add(variables('v_page_num'), 1)",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "set_page_num",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "set_next_page_num",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "v_page_num",
-								"value": {
-									"value": "@variables('v_next_page_num')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "web_get_current_page",
-							"type": "WebActivity",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"method": "GET",
-								"url": {
-									"value": "@concat('https://jobsearch.api.jobtechdev.se/search?q=', pipeline().parameters.p_query,\n        '&limit=', string(pipeline().parameters.p_limit),\n        '&offset=', string(variables('v_offset')))",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "set_row_count",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "web_get_current_page",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "v_row_count",
-								"value": {
-									"value": "@length(activity('web_get_current_page').output.hits)",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "copy_jason_to_adsl",
+							"name": "copy_current_jobsearch_page",
 							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "set_row_count",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -223,11 +76,11 @@
 							]
 						},
 						{
-							"name": "set_has_more",
+							"name": "set_next_offset",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "copy_jason_to_adsl",
+									"activity": "copy_current_jobsearch_page",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -239,9 +92,81 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "v_has_more",
+								"variableName": "v_next_offset",
 								"value": {
-									"value": "@equals(variables('v_row_count'), pipeline().parameters.p_limit)",
+									"value": "@add(variables('v_offset'), pipeline().parameters.p_limit)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_offset",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_next_offset",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_offset",
+								"value": {
+									"value": "@variables('v_next_offset')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_next_page",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_offset",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_next_page_num",
+								"value": {
+									"value": "@add(variables('v_page_num'), 1)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_page_num",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_next_page",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_page_num",
+								"value": {
+									"value": "@variables('v_next_page_num')",
 									"type": "Expression"
 								}
 							}
@@ -263,6 +188,10 @@
 			"p_target_folder": {
 				"type": "string",
 				"defaultValue": "raw/arbetsformedlingen_current"
+			},
+			"p_max_pages": {
+				"type": "int",
+				"defaultValue": 3
 			}
 		},
 		"variables": {
@@ -281,14 +210,6 @@
 			"v_next_page_num": {
 				"type": "Integer",
 				"defaultValue": 1
-			},
-			"v_has_more": {
-				"type": "Boolean",
-				"defaultValue": true
-			},
-			"v_row_count": {
-				"type": "Integer",
-				"defaultValue": 0
 			}
 		},
 		"annotations": [],
