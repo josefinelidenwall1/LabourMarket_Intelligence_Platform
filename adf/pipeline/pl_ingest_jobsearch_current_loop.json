@@ -1,0 +1,36 @@
+{
+	"name": "pl_ingest_jobsearch_current_loop",
+	"properties": {
+		"parameters": {
+			"p_query": {
+				"type": "string",
+				"defaultValue": "data"
+			},
+			"p_limit": {
+				"type": "int",
+				"defaultValue": 100
+			},
+			"p_target_folder": {
+				"type": "string",
+				"defaultValue": "raw/arbetsformedlingen_current"
+			},
+			"p_max_pages": {
+				"type": "int",
+				"defaultValue": 3
+			}
+		},
+		"variables": {
+			"v_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-03-17T12:45:07Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
