@@ -10,17 +10,24 @@
 				"type": "int",
 				"defaultValue": 100
 			},
-			"p_start_year": {
-				"type": "int",
-				"defaultValue": 2016
-			},
-			"P_end_year": {
-				"type": "int",
-				"defaultValue": 2025
-			},
 			"p_target_folder": {
 				"type": "string",
 				"defaultValue": "raw/arbetsformedlingen_historical"
+			},
+			"p_years": {
+				"type": "array",
+				"defaultValue": [
+					"2016",
+					"2017",
+					"2018",
+					"2019",
+					"2020",
+					"2021",
+					"2022",
+					"2023",
+					"2024",
+					"2025"
+				]
 			}
 		},
 		"variables": {
