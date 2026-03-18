@@ -19,7 +19,9 @@
 						"type": "JsonSource",
 						"storeSettings": {
 							"type": "HttpReadSettings",
-							"requestMethod": "GET"
+							"requestMethod": "POST",
+							"requestBody": "{\n  \"response\": {\n    \"format\": \"csv\"\n  }\n}",
+							"requestTimeout": ""
 						},
 						"formatSettings": {
 							"type": "JsonReadSettings"
