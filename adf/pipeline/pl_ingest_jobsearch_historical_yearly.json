@@ -1,0 +1,62 @@
+{
+	"name": "pl_ingest_jobsearch_historical_yearly",
+	"properties": {
+		"parameters": {
+			"p_query": {
+				"type": "string",
+				"defaultValue": "data"
+			},
+			"p_limit": {
+				"type": "int",
+				"defaultValue": 100
+			},
+			"p_start_year": {
+				"type": "int",
+				"defaultValue": 2016
+			},
+			"P_end_year": {
+				"type": "int",
+				"defaultValue": 2025
+			},
+			"p_target_folder": {
+				"type": "string",
+				"defaultValue": "raw/arbetsformedlingen_historical"
+			}
+		},
+		"variables": {
+			"v_current_year": {
+				"type": "Integer",
+				"defaultValue": 2016
+			},
+			"v_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_next_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_next_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_next_year": {
+				"type": "Integer",
+				"defaultValue": 2016
+			},
+			"v_has_more_pages": {
+				"type": "Boolean",
+				"defaultValue": true
+			},
+			"v_row_count": {
+				"type": "Integer",
+				"defaultValue": 0
+			}
+		},
+		"annotations": []
+	}
+}
