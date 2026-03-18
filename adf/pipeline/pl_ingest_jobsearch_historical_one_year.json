@@ -1,0 +1,46 @@
+{
+	"name": "pl_ingest_jobsearch_historical_one_year",
+	"properties": {
+		"parameters": {
+			"p_query": {
+				"type": "string"
+			},
+			"p_limit": {
+				"type": "int"
+			},
+			"p_target_folder": {
+				"type": "string"
+			},
+			"p_year": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"v_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_next_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_next_page_number": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_has_more_pages": {
+				"type": "Boolean",
+				"defaultValue": true
+			},
+			"v_row_count": {
+				"type": "Integer",
+				"defaultValue": 0
+			}
+		},
+		"annotations": []
+	}
+}
