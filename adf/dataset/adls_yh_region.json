@@ -1,0 +1,20 @@
+{
+	"name": "adls_yh_region",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adls_landing_yh_region",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "yh_edu_region",
+				"folderPath": "raw/yh_education_region",
+				"fileSystem": "landing"
+			}
+		},
+		"schema": {}
+	}
+}
