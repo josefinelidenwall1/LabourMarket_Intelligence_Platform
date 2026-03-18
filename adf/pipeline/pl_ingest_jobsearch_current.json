@@ -38,13 +38,26 @@
 				"inputs": [
 					{
 						"referenceName": "ds_rest_jobsearch_current",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"relativeUrl": {
+								"value": "@concat('/search?q=', pipeline().parameters.p_query, '&limit=', string(pipeline().parameters.p_limit), '&offset=0')",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "ds_adls_landing_json",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"dirPath": {
+								"value": "@pipeline().parameters.p_target_folder",
+								"type": "Expression"
+							},
+							"fileName": "jobsearch_page_0.json"
+						}
 					}
 				]
 			}
