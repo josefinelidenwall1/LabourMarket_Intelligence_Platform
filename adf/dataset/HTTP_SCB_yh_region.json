@@ -1,0 +1,18 @@
+{
+	"name": "HTTP_SCB_yh_region",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Http_yh_region",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			},
+			"encodingName": "ISO-8859-1"
+		},
+		"schema": {}
+	}
+}
