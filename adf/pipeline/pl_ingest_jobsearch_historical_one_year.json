@@ -26,6 +26,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
+								"method": "GET",
 								"url": {
 									"value": "@concat(\r\n  'https://historical.api.jobtechdev.se/search?q=',\r\n  pipeline().parameters.p_query,\r\n  '&published-after=',\r\n  pipeline().parameters.p_year,\r\n  '&published-before=',\r\n  string(add(int(pipeline().parameters.p_year),1)),\r\n  '&limit=',\r\n  string(pipeline().parameters.p_limit),\r\n  '&offset=',\r\n  string(variables('v_offset'))\r\n)",
 									"type": "Expression"
