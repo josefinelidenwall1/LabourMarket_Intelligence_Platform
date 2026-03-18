@@ -1,0 +1,12 @@
+{
+	"name": "Http_yh_inriktning",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://statistikdatabasen.scb.se/api/v2/tables/TAB5774/data?lang=sv&valueCodes[ContentsCode]=000004ZM&valueCodes[Kon]=2,1&valueCodes[UtbildnInriktn]=1M,2M,3M,4M,5M,6M,7M,8M,9M,11M,12M,13M,14M,15M,16&valueCodes[Alder]=totalt&valueCodes[Tid]=2016,2017,2018,2019,2020,2021,2022,2023,2024&codelist[UtbildnInriktn]=vs_AUtbOmrMYH",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
