@@ -82,6 +82,46 @@
 						"year": 2016,
 						"file_name": "2016_beta1_jsonl.zip",
 						"relative_url": "/annonser/historiska/berikade/kompletta/2016_beta1_jsonl.zip"
+					},
+					{
+						"year": 2017,
+						"file_name": "2017_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2017_beta1_jsonl.zip"
+					},
+					{
+						"year": 2018,
+						"file_name": "2018_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2018_beta1_jsonl.zip"
+					},
+					{
+						"year": 2019,
+						"file_name": "2019_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2019_beta1_jsonl.zip"
+					},
+					{
+						"year": 2020,
+						"file_name": "2020_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2020_beta1_jsonl.zip"
+					},
+					{
+						"year": 2021,
+						"file_name": "2021_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2021_beta1_jsonl.zip"
+					},
+					{
+						"year": 2022,
+						"file_name": "2022_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2022_beta1_jsonl.zip"
+					},
+					{
+						"year": 2023,
+						"file_name": "2023_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2023_beta1_jsonl.zip"
+					},
+					{
+						"year": 2024,
+						"file_name": "2024_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2024_beta1_jsonl.zip"
 					}
 				]
 			}
