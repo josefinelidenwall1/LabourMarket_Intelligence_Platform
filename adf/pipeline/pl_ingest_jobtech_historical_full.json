@@ -69,6 +69,71 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "copy_adls_zip_to_extracted_jsonl",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "copy_http_binary_to_adls",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings",
+										"compressionProperties": {
+											"type": "ZipDeflateReadSettings"
+										}
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_adls_jobtech_zip_source",
+									"type": "DatasetReference",
+									"parameters": {
+										"dirPath": "raw/arbetsformedlingen_historical",
+										"fileName": "@item().file_name"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_landing_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"dirPath": "raw/arbetsformedlingen_historical_extracted",
+										"fileName": "@concat(split(item().file_name, '_')[0], '.enriched.jsonl')"
+									}
+								}
+							]
 						}
 					]
 				}
