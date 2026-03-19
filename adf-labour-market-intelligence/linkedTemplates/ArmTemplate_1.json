@@ -1,0 +1,357 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-labour-market-intelligence"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingest_jobtech_historical_full')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ingest_historical_files_fe_year",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.p_files",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "copy_http_binary_to_adls",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET"
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_http_jobtech_binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"relativeUrl": "@item().relative_url"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_adls_jobtech_binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"folderPath": {
+													"value": "raw/arbetsformedlingen_historical",
+													"type": "Expression"
+												},
+												"fileName": {
+													"value": "@item().file_name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"p_files": {
+						"type": "array",
+						"defaultValue": [
+							{
+								"year": 2016,
+								"file_name": "2016_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2016_beta1_jsonl.zip"
+							},
+							{
+								"year": 2017,
+								"file_name": "2017_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2017_beta1_jsonl.zip"
+							},
+							{
+								"year": 2018,
+								"file_name": "2018_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2018_beta1_jsonl.zip"
+							},
+							{
+								"year": 2019,
+								"file_name": "2019_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2019_beta1_jsonl.zip"
+							},
+							{
+								"year": 2020,
+								"file_name": "2020_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2020_beta1_jsonl.zip"
+							},
+							{
+								"year": 2021,
+								"file_name": "2021_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2021_beta1_jsonl.zip"
+							},
+							{
+								"year": 2022,
+								"file_name": "2022_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2022_beta1_jsonl.zip"
+							},
+							{
+								"year": 2023,
+								"file_name": "2023_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2023_beta1_jsonl.zip"
+							},
+							{
+								"year": 2024,
+								"file_name": "2024_beta1_jsonl.zip",
+								"relative_url": "/annonser/historiska/berikade/kompletta/2024_beta1_jsonl.zip"
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingest_yh_education_region')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_scb_yh_eduregion_to_landing_copy1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "HTTP_SCB_yh_region",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "adls_yh_region_csv",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "copy_scb_yh_edutopic_to_landing",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "copy_scb_yh_eduregion_to_landing_copy1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "http_yh_inriktning",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "adls_yh_subject",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_ingest_jobsearch_historical_yearly_deprecated')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.p_years",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Execute Pipeline1",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_ingest_jobsearch_historical_one_year_deprecated",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"p_query": {
+												"value": "@pipeline().parameters.p_query",
+												"type": "Expression"
+											},
+											"p_limit": {
+												"value": "@pipeline().parameters.p_limit",
+												"type": "Expression"
+											},
+											"p_target_folder": {
+												"value": "@pipeline().parameters.p_target_folder",
+												"type": "Expression"
+											},
+											"p_year": {
+												"value": "@item()",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"p_query": {
+						"type": "string",
+						"defaultValue": "data"
+					},
+					"p_limit": {
+						"type": "int",
+						"defaultValue": 100
+					},
+					"p_target_folder": {
+						"type": "string",
+						"defaultValue": "raw/arbetsformedlingen_historical"
+					},
+					"p_years": {
+						"type": "array",
+						"defaultValue": [
+							"2016"
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
