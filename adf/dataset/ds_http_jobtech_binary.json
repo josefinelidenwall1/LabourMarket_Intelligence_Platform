@@ -19,9 +19,6 @@
 					"value": "@dataset().relativeUrl",
 					"type": "Expression"
 				}
-			},
-			"compression": {
-				"type": "ZipDeflate"
 			}
 		}
 	}
