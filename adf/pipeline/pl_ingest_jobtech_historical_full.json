@@ -59,7 +59,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "'raw/arbetsformedlingen_historical'",
+											"value": "raw/arbetsformedlingen_historical",
 											"type": "Expression"
 										},
 										"fileName": {
