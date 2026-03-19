@@ -1,5 +1,5 @@
 {
-	"name": "pl_ingest_jobsearch_current_loop_test",
+	"name": "pl_ingest_jobsearch_current_loop",
 	"properties": {
 		"activities": [
 			{
