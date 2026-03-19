@@ -1,5 +1,5 @@
 {
-	"name": "pl_ingest_jobsearch_historical_yearly",
+	"name": "pl_ingest_jobsearch_historical_yearly_deprecated",
 	"properties": {
 		"activities": [
 			{
@@ -23,7 +23,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pl_ingest_jobsearch_historical_one_year",
+									"referenceName": "pl_ingest_jobsearch_historical_one_year_deprecated",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

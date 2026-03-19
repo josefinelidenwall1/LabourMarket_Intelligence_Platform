@@ -1,5 +1,5 @@
 {
-	"name": "pl_ingest_jobsearch_historical_one_year",
+	"name": "pl_ingest_jobsearch_historical_one_year_deprecated",
 	"properties": {
 		"activities": [
 			{
