@@ -1,0 +1,91 @@
+{
+	"name": "pl_ingest_jobtech_historical_full",
+	"properties": {
+		"activities": [
+			{
+				"name": "ingest_historical_files_fe_year",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.p_files",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "copy_http_binary_to_adls",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_http_jobtech_binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": "@item().relative_url"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_jobtech_binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "@concat('raw/arbetsformedlingen_historical/year_', string(item().year))",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@item().file_name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"p_files": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"year": 2016,
+						"file_name": "2016_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2016_beta1_jsonl.zip"
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
