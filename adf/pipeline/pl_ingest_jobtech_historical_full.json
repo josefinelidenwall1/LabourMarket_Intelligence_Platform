@@ -104,12 +104,9 @@
 									}
 								},
 								"sink": {
-									"type": "JsonSink",
+									"type": "BinarySink",
 									"storeSettings": {
 										"type": "AzureBlobFSWriteSettings"
-									},
-									"formatSettings": {
-										"type": "JsonWriteSettings"
 									}
 								},
 								"enableStaging": false
@@ -126,10 +123,10 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_adls_landing_json",
+									"referenceName": "ds_adls_jobtech_binary",
 									"type": "DatasetReference",
 									"parameters": {
-										"dirPath": "raw/arbetsformedlingen_historical_extracted",
+										"folderPath": "raw/arbetsformedlingen_historical_extracted",
 										"fileName": "@concat(split(item().file_name, '_')[0], '.enriched.jsonl')"
 									}
 								}
