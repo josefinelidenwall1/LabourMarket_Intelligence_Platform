@@ -1,0 +1,24 @@
+{
+	"name": "ds_adls_jobtech_binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_landing",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"folderPath": {
+				"type": "string"
+			},
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation"
+			}
+		}
+	}
+}
