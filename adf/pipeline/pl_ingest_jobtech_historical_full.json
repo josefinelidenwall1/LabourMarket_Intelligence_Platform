@@ -59,7 +59,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "@concat('raw/arbetsformedlingen_historical/year_', string(item().year))",
+											"value": "@concat('arbetsformedlingen_historical/year_', string(item().year))",
 											"type": "Expression"
 										},
 										"fileName": {
