@@ -1,0 +1,12 @@
+{
+	"name": "ls_https_scb_api",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://api.scb.se/OV0104/v1/doris/en/ssd",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
