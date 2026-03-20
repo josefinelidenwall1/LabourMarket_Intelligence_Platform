@@ -31,391 +31,80 @@ Source file SCB edu_region is encoded in `ISO-8859-1` (Latin-1), important to ta
 
 ---
 
-# Data Dictionary Swedish Labour Market Datasets
+# SCB Silver Layer: Data Dictionary & Quality Caveats
+
+## Known Caveats & Data Quality Rules
+
+1. **Privacy Suppression (`NULL` Handling):** To protect privacy in groups with very few individuals, SCB masks granular data using symbols like `..`, `...`, or `.`. In the Silver layer, all suppressed metric values are strictly cast to `NULL`.
+2. **Pre-aggregated Totals (The `1+2` Rule):** SCB often provides pre-calculated totals (e.g., `sex = '1+2'`) alongside granular rows (`1` and `2`). **These are intentionally kept in the Silver layer.** Because SCB suppresses low-count granular rows, deleting the `1+2` row in Silver would cause permanent data loss for total market sizing. BI-level filtering of these totals must be handled in the Gold layer.
+3. **Strict Data Typing:** All dimensional attributes (e.g., `region`, `sex`, `year`) are stored as `STRING` to preserve SCB's exact formatting and leading zeros (e.g., region `00`). All factual metrics are cast to `DOUBLE`.
 
 ---
 
-## Table of Contents
-
-1. [aku_employment_stock](#1-aku_employment_stock)
-2. [aku_population_region](#2-aku_population_region)
-3. [aku_unemployed_age_sex](#3-aku_unemployed_age_sex)
-4. [rams_employment](#4-rams_employment)
-5. [wages_occupation_sector](#5-wages_occupation_sector)
-
----
-
-## 1. aku_employment_stock
-
-**Source:** SCB — Statistics Sweden, Labour Force Survey (AKU/LFS)
-
-**Table ID:** `AM/AM0401/AM0401I/NAKUSysselYrke2012Ar`
-
-**File:** `aku_employment_stock_occupation.csv`
-
-**Coverage:** Employed persons aged 15–74
-
-**Granularity:** Annual
-
-**Years:** 2015–2025
-
-**Unit:** Thousands of persons
-
-### Columns
-
-| Raw column              | Clean name           | Type         | Description                                          |
-| ----------------------- | -------------------- | ------------ | ---------------------------------------------------- |
-| `Anknytningsgrad`       | `attachment_code`    | string       | Raw code — degree of labour market attachment        |
-| `Anknytningsgrad_label` | `attachment`         | string       | Human-readable attachment label                      |
-| `Yrke`                  | `occupation_code`    | string       | SSYK 2012 occupation code                            |
-| `Yrke_label`            | `occupation`         | string       | Occupation title                                     |
-| `Kon`                   | `sex_code`           | string       | Sex code                                             |
-| `Kon_label`             | `sex`                | string       | Sex label                                            |
-| `Tid`                   | `year`               | int          | Year                                                 |
-| `Tid_label`             | _(drop)_             | string       | Year display — duplicate of Tid, drop after renaming |
-| `Employed persons`      | `employed_thousands` | float        | Estimated number of employed persons                 |
-| `Margin of error ±`     | `margin_of_error`    | float / null | LFS sampling margin of error                         |
-| `dataset`               | `source`             | string       | Source label added during fetch                      |
-
-### Key Values
-
-**Anknytningsgrad (attachment)**
-
-| Code      | Label            |
-| --------- | ---------------- |
-| `ANSTTOT` | Employees, total |
-
-> Run key printer on this table to retrieve all remaining attachment codes.
-
-**Yrke (occupation — SSYK 2012)**
-
-| Code   | Label                       |
-| ------ | --------------------------- |
-| `0000` | All occupations (aggregate) |
-
-> ~120 three-digit SSYK 2012 codes. Full list available via metadata endpoint.
-
-**Kon (sex)**
-
-| Code | Label |
-| ---- | ----- |
-| `1`  | Men   |
-| `2`  | Women |
-
-### Notes
-
-- `..` = suppressed estimate (unreliable due to small sample) — treat as null during cleaning
-- `0000` in Yrke is the aggregate row — exclude when analysing per occupation
-- Values are in **thousands** — multiply by 1,000 to get headcount
-
----
-
-## 2. aku_population_region
-
-**Source:** SCB — Statistics Sweden, Labour Force Survey (AKU/LFS)
-
-**Table ID:** `AM/AM0401/AM0401N/NAKUBefolkningLAr`
-
-**File:** `aku_population_region_labourstatus.csv`
-
-**Coverage:** Population aged 15–74 by region and labour force status
-
-**Granularity:** Annual
-
-**Years:** 2005–2025
-
-**Unit:** Thousands of persons / percent
-
-### Columns
-
-| Raw column                  | Clean name             | Type         | Description                                          |
-| --------------------------- | ---------------------- | ------------ | ---------------------------------------------------- |
-| `Region`                    | `region_code`          | string       | County code                                          |
-| `Region_label`              | `region`               | string       | County name                                          |
-| `Arbetskraftstillh`         | `labour_status_code`   | string       | Labour force status — raw code                       |
-| `Arbetskraftstillh_label`   | `labour_status`        | string       | Labour force status label                            |
-| `Kon`                       | `sex_code`             | string       | Sex code                                             |
-| `Kon_label`                 | `sex`                  | string       | Sex label                                            |
-| `Tid`                       | `year`                 | int          | Year                                                 |
-| `Tid_label`                 | _(drop)_               | string       | Year display — duplicate of Tid, drop after renaming |
-| `Thousands`                 | `population_thousands` | float        | Population count in thousands                        |
-| `Margin of error ±, 1000s`  | `margin_thousands`     | float / null | Sampling error for thousands figure                  |
-| `Percent`                   | `share_pct`            | float        | Share of labour force (%)                            |
-| `Margin of error ± percent` | `margin_pct`           | float / null | Sampling error for percentage figure                 |
-| `dataset`                   | `source`               | string       | Source label added during fetch                      |
-
-### Key Values
-
-**Region**
-
-| Code | Label                  |
-| ---- | ---------------------- |
-| `00` | Sweden (all regions)   |
-| `01` | Stockholm county       |
-| `03` | Uppsala county         |
-| `04` | Södermanland county    |
-| `05` | Östergötland county    |
-| `06` | Jönköping county       |
-| `07` | Kronoberg county       |
-| `08` | Kalmar county          |
-| `09` | Gotland county         |
-| `10` | Blekinge county        |
-| `12` | Skåne county           |
-| `13` | Halland county         |
-| `14` | Västra Götaland county |
-| `17` | Värmland county        |
-| `18` | Örebro county          |
-| `19` | Västmanland county     |
-| `20` | Dalarna county         |
-| `21` | Gävleborg county       |
-| `22` | Västernorrland county  |
-| `23` | Jämtland county        |
-| `24` | Västerbotten county    |
-| `25` | Norrbotten county      |
-
-**Arbetskraftstillh (labour status)**
-
-| Code     | Label                           |
-| -------- | ------------------------------- |
-| `TOTALT` | Total population (all statuses) |
-
-> Run key printer to retrieve all status codes (employed / unemployed / outside labour force).
-
-### Notes
-
-- To isolate unemployed: filter `labour_status_label = "unemployed"` after cleaning
-- `..` = suppressed — treat as null
-- Values are in **thousands**
-
----
-
-## 3. aku_unemployed_age_sex
-
-**Source:** SCB — Statistics Sweden, Labour Force Survey (AKU/LFS)
-
-**Table ID:** `AM/AM0401/AM0401L/NAKUArblheltidstudAr`
-
-**File:** `aku_unemployed_age_sex.csv`
-
-**Coverage:** Unemployed persons aged 15–74, national totals only
-
-**Granularity:** Annual
-
-**Years:** 2001–2025
-
-**Unit:** Thousands of persons / percent
-
-### Columns
-
-| Raw column                  | Clean name              | Type         | Description                                          |
-| --------------------------- | ----------------------- | ------------ | ---------------------------------------------------- |
-| `Arbetskraftstillh`         | `labour_status_code`    | string       | Labour force status — raw code                       |
-| `Arbetskraftstillh_label`   | `labour_status`         | string       | Labour force status label                            |
-| `Kon`                       | `sex_code`              | string       | Sex code                                             |
-| `Kon_label`                 | `sex`                   | string       | Sex label                                            |
-| `Alder`                     | `age_group_code`        | string       | Age group code                                       |
-| `Alder_label`               | `age_group`             | string       | Age group label                                      |
-| `Tid`                       | `year`                  | int          | Year                                                 |
-| `Tid_label`                 | _(drop)_                | string       | Year display — duplicate of Tid, drop after renaming |
-| `1000s`                     | `unemployed_thousands`  | float        | Unemployed persons in thousands                      |
-| `Margin of error ±, 1000s`  | `margin_thousands`      | float / null | Sampling error for thousands figure                  |
-| `Percent`                   | `unemployment_rate_pct` | float        | Unemployment rate (%)                                |
-| `Margin of error ± percent` | `margin_pct`            | float / null | Sampling error for rate                              |
-| `dataset`                   | `source`                | string       | Source label added during fetch                      |
-
-### Key Values
-
-**Arbetskraftstillh (labour status)**
-
-| Code   | Label      |
-| ------ | ---------- |
-| `ALÖS` | Unemployed |
-
-**Alder (age group)**
-
-| Code    | Label       |
-| ------- | ----------- |
-| `15-24` | 15–24 years |
-
-> Run key printer to retrieve all age group codes.
-
-### Notes
-
-- No occupation or region dimension — **national totals only**
-- Use alongside `aku_employment_stock` for occupation-level analysis
-- `..` = suppressed — treat as null
-
----
-
-## 4. rams_employment
-
-**Source:** SCB — Statistics Sweden, Occupational Register (RAMS)
-
-**Table IDs:**
-
-| Period    | Table ID                      | File                 |
-| --------- | ----------------------------- | -------------------- |
-| 2016–2018 | `AM/AM0208/AM0208M/YREG60`    | `rams_2016_2018.csv` |
-| 2019–2021 | `AM/AM0208/AM0208M/YREG60N`   | `rams_2019_2021.csv` |
-| 2022–2024 | `AM/AM0208/AM0208M/YREG60BAS` | `rams_2022_2024.csv` |
-
-**Coverage:** Employees aged 16–64, register-based
-
-**Granularity:** Annual
-
-**Years:** 2016–2024 (across three tables)
-
-**Unit:** Number of persons (headcount)
-
-### Columns
-
-| Raw column       | Clean name        | Type   | Description                                          |
-| ---------------- | ----------------- | ------ | ---------------------------------------------------- |
-| `Region`         | `region_code`     | string | County code of workplace                             |
-| `Region_label`   | `region`          | string | County name                                          |
-| `Yrke2012`       | `occupation_code` | string | SSYK 2012 occupation code (4-digit)                  |
-| `Yrke2012_label` | `occupation`      | string | Occupation title                                     |
-| `Kon`            | `sex_code`        | string | Sex code                                             |
-| `Kon_label`      | `sex`             | string | Sex label                                            |
-| `Tid`            | `year`            | int    | Year                                                 |
-| `Tid_label`      | _(drop)_          | string | Year display — duplicate of Tid, drop after renaming |
-| `Number`         | `employed_count`  | int    | Number of employees (headcount)                      |
-| `dataset`        | `source`          | string | Source label — indicates which table period          |
-
-### Key Values
-
-**Region** — same county codes as [aku_population_region](#2-aku_population_region) above.
-
-**Yrke2012 (occupation — SSYK 2012, 4-digit)**
-
-| Code   | Label                                  |
-| ------ | -------------------------------------- |
-| `0110` | Commissioned armed forces officers     |
-| `0210` | Non-commissioned armed forces officers |
-| `0310` | Armed forces occupation, other ranks   |
-| `1111` | Legislators                            |
-| `1112` | Senior government officials            |
-
-> ~400 four-digit codes. Full list returned by metadata endpoint.
-
-**Kon (sex)**
-
-| Code | Label |
-| ---- | ----- |
-| `1`  | Men   |
-| `2`  | Women |
-
-### Notes
-
-- SSYK 2012 coverage starts **2014** — do not compare with pre-2014 data
-- Three separate table versions cover the full 2016–2024 range — stack CSVs after cleaning
-- Unlike AKU, values are **headcounts** (not thousands)
-- `00` in Region = all Sweden aggregate
-
----
-
-## 5. wages_occupation_sector
-
-**Source:** SCB — Statistics Sweden, Wage Structure Statistics
-
-**Table IDs:**
-
-| Period    | Table ID                                 | File                  |
-| --------- | ---------------------------------------- | --------------------- |
-| 2016–2022 | `AM/AM0110/AM0110A/LoneSpridSektorYrk4A` | `wages_2016_2022.csv` |
-| 2023–2024 | `AM/AM0110/AM0110A/LoneSpridSektYrk4AN`  | `wages_2023_2024.csv` |
-
-**Coverage:** All employees by sector and occupation
-
-**Granularity:** Annual
-
-**Years:** 2016–2024 (across two tables)
-
-**Unit:** SEK per month
-
-### Columns — 2016–2022
-
-| Raw column        | Clean name        | Type   | Description                          |
-| ----------------- | ----------------- | ------ | ------------------------------------ |
-| `Sektor`          | `sector_code`     | string | Sector code                          |
-| `Sektor_label`    | `sector`          | string | Sector name                          |
-| `Yrke2012`        | `occupation_code` | string | SSYK 2012 occupation code            |
-| `Yrke2012_label`  | `occupation`      | string | Occupation title                     |
-| `Kon`             | `sex_code`        | string | Sex code                             |
-| `Kon_label`       | `sex`             | string | Sex label                            |
-| `Tid`             | `year`            | int    | Year                                 |
-| `Tid_label`       | _(drop)_          | string | Year display — drop after renaming   |
-| `Monthly salary`  | `wage_mean`       | int    | Average monthly salary (SEK)         |
-| `Median`          | `wage_median`     | int    | Median monthly salary (SEK)          |
-| `10th percentile` | `wage_p10`        | int    | 10th percentile monthly salary (SEK) |
-| `25th percentile` | `wage_p25`        | int    | 25th percentile monthly salary (SEK) |
-| `75th percentile` | `wage_p75`        | int    | 75th percentile monthly salary (SEK) |
-| `90th percentile` | `wage_p90`        | int    | 90th percentile monthly salary (SEK) |
-| `dataset`         | `source`          | string | Source label                         |
-
-### Columns — 2023–2024 (extended — adds confidence intervals)
-
-All columns from 2016–2022 are present, plus:
-
-| Raw column                                                                | Clean name         | Type       | Description            |
-| ------------------------------------------------------------------------- | ------------------ | ---------- | ---------------------- |
-| `Monthly salary, 95 percent confidence interval`                          | `wage_mean_ci95`   | int / null | 95% CI for mean salary |
-| `Median, 95 percent confidence interval`                                  | `wage_median_ci95` | int / null | 95% CI for median      |
-| `Average monthly salary, 10th percentile, 95 percent confidence interval` | `wage_p10_ci95`    | int / null | 95% CI for p10         |
-| `Average monthly salary, 25th percentile, 95 percent confidence interval` | `wage_p25_ci95`    | int / null | 95% CI for p25         |
-| `Average monthly salary, 75th percentile, 95 percent confidence interval` | `wage_p75_ci95`    | int / null | 95% CI for p75         |
-| `Average monthly salary, 90th percentile, 95 percent confidence interval` | `wage_p90_ci95`    | int / null | 95% CI for p90         |
-
-### Key Values
-
-**Sektor (sector)**
-
-| Code | Label       |
-| ---- | ----------- |
-| `0`  | All sectors |
-
-> Run key printer to retrieve all sector codes (e.g. state, municipality, private).
-
-**Yrke2012 (occupation)**
-
-| Code   | Label                       |
-| ------ | --------------------------- |
-| `0000` | All occupations (aggregate) |
-
-> ~400 four-digit SSYK 2012 codes.
-
-**Kon (sex)**
-
-| Code | Label |
-| ---- | ----- |
-| `1`  | Men   |
-| `2`  | Women |
-
-### Notes
-
-- Values are in **SEK per month**
-- `..` = suppressed — treat as null
-- `0000` in Yrke2012 = aggregate row — exclude when analysing per occupation
-- Methodology break in **2018** due to AID code updates for municipalities — compare pre/post 2018 wage figures with caution
-- 2023–2024 table includes confidence intervals not present in 2016–2022 — align column schema when stacking
-
----
-
-## Cross-table Reference
-
-| Shared key                   | Tables                                                         | Notes                                                                              |
-| ---------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `occupation_code`(SSYK 2012) | rams_employment, aku_employment_stock, wages_occupation_sector | Use for occupation-level joins.`0000`= aggregate in AKU/wages; not present in RAMS |
-| `region_code`                | rams_employment, aku_population_region                         | County codes 00–25. RAMS uses workplace region; AKU uses residence region          |
-| `sex_code`                   | all tables                                                     | 1 = men, 2 = women                                                                 |
-| `year`                       | all tables                                                     | Annual. RAMS split across 3 table versions; wages split across 2                   |
-
-## Known Limitations
-
-| Limitation                                 | Affected tables                                                        |
-| ------------------------------------------ | ---------------------------------------------------------------------- |
-| No unemployment × occupation cross         | AKU — LFS sample too small for reliable estimates at that intersection |
-| SSYK 2012 break at 2014                    | RAMS, wages, AKU — do not compare with pre-2014 occupation data        |
-| AKU values in thousands, RAMS in headcount | Do not mix units without conversion                                    |
-| Wage methodology break in 2018             | wages_occupation_sector                                                |
-| `..`suppressed values throughout           | All AKU tables                                                         |
+## Data Dictionary (silver) SCB wages data set
+
+### 1. `wages`
+
+**Description:** Monthly salary distributions, percentiles, and confidence intervals broken down by sector, occupation, sex, and year.
+
+| Column Name                  | Data Type | Description                                                  |
+| :--------------------------- | :-------- | :----------------------------------------------------------- |
+| `sector`                     | STRING    | The sector of the labor market (e.g., public, private).      |
+| `occupation_code`            | STRING    | The SSYK 2012 classification code for the profession.        |
+| `sex`                        | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).         |
+| `year`                       | STRING    | The reporting year.                                          |
+| `monthly_salary_avg`         | DOUBLE    | The average (mean) monthly salary.                           |
+| `salary_median`              | DOUBLE    | The median (50th percentile) monthly salary.                 |
+| `salary_p10`                 | DOUBLE    | The 10th percentile salary (bottom 10% earn less than this). |
+| `salary_p25`                 | DOUBLE    | The 25th percentile salary (lower quartile).                 |
+| `salary_p75`                 | DOUBLE    | The 75th percentile salary (upper quartile).                 |
+| `salary_p90`                 | DOUBLE    | The 90th percentile salary (top 10% earn more than this).    |
+| `monthly_salary_avg_ci95`    | DOUBLE    | 95% confidence interval margin for the average salary.       |
+| `monthly_salary_median_ci95` | DOUBLE    | 95% confidence interval margin for the median salary.        |
+| `salary_p10_ci95`            | DOUBLE    | 95% confidence interval margin for the 10th percentile.      |
+| `salary_p25_ci95`            | DOUBLE    | 95% confidence interval margin for the 25th percentile.      |
+| `salary_p75_ci95`            | DOUBLE    | 95% confidence interval margin for the 75th percentile.      |
+| `salary_p90_ci95`            | DOUBLE    | 95% confidence interval margin for the 90th percentile.      |
+
+### 2. `aku_employment`
+
+**Description:** The total stock of employed persons (measured in thousands) broken down by occupation and sex, sourced from the Labour Force Surveys (AKU).
+
+| Column Name          | Data Type | Description                                                                   |
+| :------------------- | :-------- | :---------------------------------------------------------------------------- |
+| `attachment_code`    | STRING    | Degree of attachment to the labor market (e.g.,`ANSTTOT` for total employed). |
+| `occupation_code`    | STRING    | The SSYK 2012 classification code for the profession.                         |
+| `sex`                | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).                          |
+| `year`               | STRING    | The reporting year.                                                           |
+| `employed_thousands` | DOUBLE    | Number of employed persons, measured in thousands.                            |
+| `moe_thousands`      | DOUBLE    | Margin of error for the employed count (in thousands).                        |
+
+### 3. `aku_population`
+
+**Description:** High-level labor force and population statistics broken down by geographic region and labor status.
+
+| Column Name          | Data Type | Description                                                                                 |
+| :------------------- | :-------- | :------------------------------------------------------------------------------------------ |
+| `region`             | STRING    | Geographic region code (`00` typically represents all of Sweden).                           |
+| `labour_status_code` | STRING    | Status in the labor market (e.g.,`TOTALT` for total population, `DAIR` for in labor force). |
+| `sex`                | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).                                        |
+| `year`               | STRING    | The reporting year.                                                                         |
+| `pop_thousands`      | DOUBLE    | Population count for the given slice, measured in thousands.                                |
+| `moe_thousands`      | DOUBLE    | Margin of error for the population count (in thousands).                                    |
+| `pop_percent`        | DOUBLE    | The percentage of the broader population this group represents.                             |
+| `moe_percent`        | DOUBLE    | Margin of error for the percentage metric.                                                  |
+
+### 4. `aku_unemployment`
+
+**Description:** Unemployment figures and rates broken down by age group and sex.
+
+| Column Name          | Data Type | Description                                                     |
+| :------------------- | :-------- | :-------------------------------------------------------------- |
+| `labour_status_code` | STRING    | Status in the labor market (primarily `ALOS` for unemployed).   |
+| `sex`                | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).            |
+| `age_group`          | STRING    | The age bracket for the demographic (e.g.,`15-24`, `tot15-74`). |
+| `year`               | STRING    | The reporting year.                                             |
+| `unemp_thousands`    | DOUBLE    | Number of unemployed persons, measured in thousands.            |
+| `moe_thousands`      | DOUBLE    | Margin of error for the unemployed count (in thousands).        |
+| `unemp_percent`      | DOUBLE    | The unemployment rate as a percentage of the labor force.       |
+| `moe_percent`        | DOUBLE    | Margin of error for the unemployment rate percentage.           |
