@@ -18,6 +18,6 @@ def load_environment_variables() -> dict:
 def get_llm_client(config: dict) -> AzureOpenAI:
     return AzureOpenAI(
         api_key=config["oai_key"],
-        api_version="oai_api_version",
+        api_version=config["oai_api_version"],
         azure_endpoint=config["oai_endpoint"]
     )
