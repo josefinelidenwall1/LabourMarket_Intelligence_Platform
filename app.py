@@ -1,10 +1,29 @@
 import streamlit as st
+import RAG.config as rag_config
+from RAG.rag_main import run_hybrid_rag_pipeline
 
 st.set_page_config(
     page_title="Sweden Labour Market Intelligence Platform",
     page_icon="📊",
     layout="wide"
 )
+
+@st.cache_data
+def load_app_config():
+    return rag_config.load_environment_variables()
+
+@st.cache_resource
+def get_llm_client():
+    app_config = load_app_config()
+    return rag_config.get_llm_client(app_config)
+
+@st.cache_data(show_spinner=False, ttl=600)
+def get_rag_result(user_question: str):
+    return run_hybrid_rag_pipeline(user_question)
+
+# optional warm-up
+load_app_config()
+get_llm_client()
 
 # -------------------------
 # COLORS
@@ -110,12 +129,12 @@ st.markdown(custom_css, unsafe_allow_html=True)
 st.sidebar.markdown(
     """
     <div style="
-        font-size: 40px;
+        font-size: 38px;
         font-weight: 700;
         color: #F7E9DC;
         margin-bottom: 40px;
     ">
-        Sweden Labour Market Intelligence Platform
+        Labour Market Intelligence Platform
     </div>
     """,
     unsafe_allow_html=True
@@ -139,23 +158,25 @@ user_question = st.text_area(
 # GENERATE RESPONSE
 # -------------------------
 if st.button("Generate Insight"):
-    with st.spinner("Analyzing labour market data..."):
-        response = """
-**Key Insights**
-- Labour demand appears concentrated in major urban regions, especially in technical and digital occupations.
-- Some regions show sustained demand patterns that may indicate future skills shortages.
-- These signals can help universities identify where capacity expansion or program updates may be most relevant.
+    if not user_question.strip():
+        st.warning("Please enter a question first.")
+    else:
+        with st.spinner("Analyzing labour market data..."):
+            try:
+                result = get_rag_result(user_question)
 
-**Implications for Universities**
-- Review current program capacity in regions with strong employer demand.
-- Consider expanding technical and engineering-related programs where labour demand remains high.
-- Strengthen collaboration with employers to validate whether these demand patterns are sustained over time.
-"""
-        st.markdown(
-            f"""
-            <div class="response-box">
-                <div class="response-text">{response.replace(chr(10), '<br>')}</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                final_answer = result.get("final_answer", "No answer generated.")
+                sql_query = result.get("sql_query", "")
+                sql_preview = result.get("sql_data_preview", [])
+
+                st.markdown("### Insight")
+                st.markdown(final_answer)
+
+                with st.expander("Generated SQL"):
+                    st.code(sql_query, language="sql")
+
+                with st.expander("SQL Data Preview"):
+                    st.json(sql_preview)
+
+            except Exception as e:
+                st.error(f"Something went wrong: {e}")
