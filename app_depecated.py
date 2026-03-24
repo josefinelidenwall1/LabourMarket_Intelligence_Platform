@@ -53,10 +53,36 @@ custom_css = """
 
     /* Metric cards */
     div[data-testid="stMetric"] {
-        background-color: rgba(230, 195, 165, 0.15);
-        border: 1px solid rgba(247, 233, 220, 0.25);
-        padding: 15px;
-        border-radius: 14px;
+    background-color: #355C46;
+    border: 2px solid #E6C3A5;
+    padding: 14px;
+    border-radius: 14px;
+    min-height: 110px;
+    }
+
+    /* Metric label text */
+    div[data-testid="stMetric"] label {
+    color: #F7E9DC !important;
+    font-size: 11px !important;
+    opacity: 0.8;
+    }
+
+    /* Metric value container */
+    div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    color: #F7E9DC !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    }
+
+    /* VERY IMPORTANT: override inner span/divs inside metric value */
+    div[data-testid="stMetricValue"] * {
+    font-size: 16px !important;
+    }
+
+    /* Optional: smaller delta if ever used later */
+    div[data-testid="stMetric"] div[data-testid="stMetricDelta"] {
+    color: #F7E9DC !important;
     }
 
     /* Buttons */
