@@ -1,0 +1,193 @@
+{
+	"name": "pl_ingest_jobtech_historical_full",
+	"properties": {
+		"activities": [
+			{
+				"name": "ingest_historical_files_fe_year",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.p_files",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "copy_http_binary_to_adls",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_http_jobtech_binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": "@item().relative_url"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_jobtech_binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "raw/arbetsformedlingen_historical",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@item().file_name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "copy_adls_zip_to_extracted_jsonl",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "copy_http_binary_to_adls",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings",
+										"compressionProperties": {
+											"type": "ZipDeflateReadSettings"
+										}
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_adls_jobtech_zip_source",
+									"type": "DatasetReference",
+									"parameters": {
+										"dirPath": "raw/arbetsformedlingen_historical",
+										"fileName": "@item().file_name"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_jobtech_binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": "raw/arbetsformedlingen_historical_extracted",
+										"fileName": "@concat(split(item().file_name, '_')[0], '.enriched.jsonl')"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"p_files": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"year": 2016,
+						"file_name": "2016_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2016_beta1_jsonl.zip"
+					},
+					{
+						"year": 2017,
+						"file_name": "2017_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2017_beta1_jsonl.zip"
+					},
+					{
+						"year": 2018,
+						"file_name": "2018_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2018_beta1_jsonl.zip"
+					},
+					{
+						"year": 2019,
+						"file_name": "2019_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2019_beta1_jsonl.zip"
+					},
+					{
+						"year": 2020,
+						"file_name": "2020_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2020_beta1_jsonl.zip"
+					},
+					{
+						"year": 2021,
+						"file_name": "2021_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2021_beta1_jsonl.zip"
+					},
+					{
+						"year": 2022,
+						"file_name": "2022_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2022_beta1_jsonl.zip"
+					},
+					{
+						"year": 2023,
+						"file_name": "2023_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2023_beta1_jsonl.zip"
+					},
+					{
+						"year": 2024,
+						"file_name": "2024_beta1_jsonl.zip",
+						"relative_url": "/annonser/historiska/berikade/kompletta/2024_beta1_jsonl.zip"
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}

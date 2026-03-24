@@ -1,0 +1,219 @@
+{
+	"name": "pl_ingest_jobsearch_current_loop",
+	"properties": {
+		"activities": [
+			{
+				"name": "until_fetch_page",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(variables('v_page_num'), pipeline().parameters.p_max_pages)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "copy_current_jobsearch_page",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_jobsearch_current",
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": {
+											"value": "@concat('/search?q=', pipeline().parameters.p_query,\n        '&limit=', string(pipeline().parameters.p_limit),\n        '&offset=', string(variables('v_offset')))",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_landing_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"dirPath": {
+											"value": "@pipeline().parameters.p_target_folder",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@concat('page_', string(variables('v_page_num')), '.json')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "set_next_offset",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "copy_current_jobsearch_page",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_next_offset",
+								"value": {
+									"value": "@add(variables('v_offset'), pipeline().parameters.p_limit)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_offset",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_next_offset",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_offset",
+								"value": {
+									"value": "@variables('v_next_offset')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_next_page",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_offset",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_next_page_num",
+								"value": {
+									"value": "@add(variables('v_page_num'), 1)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_page_num",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_next_page",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_page_num",
+								"value": {
+									"value": "@variables('v_next_page_num')",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"p_query": {
+				"type": "string",
+				"defaultValue": "data"
+			},
+			"p_limit": {
+				"type": "int",
+				"defaultValue": 100
+			},
+			"p_target_folder": {
+				"type": "string",
+				"defaultValue": "raw/arbetsformedlingen_current"
+			},
+			"p_max_pages": {
+				"type": "int",
+				"defaultValue": 3
+			}
+		},
+		"variables": {
+			"v_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_next_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_next_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-03-17T12:45:07Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

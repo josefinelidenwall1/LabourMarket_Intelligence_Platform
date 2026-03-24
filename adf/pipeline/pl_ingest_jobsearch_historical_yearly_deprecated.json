@@ -1,0 +1,76 @@
+{
+	"name": "pl_ingest_jobsearch_historical_yearly_deprecated",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.p_years",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_ingest_jobsearch_historical_one_year_deprecated",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"p_query": {
+										"value": "@pipeline().parameters.p_query",
+										"type": "Expression"
+									},
+									"p_limit": {
+										"value": "@pipeline().parameters.p_limit",
+										"type": "Expression"
+									},
+									"p_target_folder": {
+										"value": "@pipeline().parameters.p_target_folder",
+										"type": "Expression"
+									},
+									"p_year": {
+										"value": "@item()",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"p_query": {
+				"type": "string",
+				"defaultValue": "data"
+			},
+			"p_limit": {
+				"type": "int",
+				"defaultValue": 100
+			},
+			"p_target_folder": {
+				"type": "string",
+				"defaultValue": "raw/arbetsformedlingen_historical"
+			},
+			"p_years": {
+				"type": "array",
+				"defaultValue": [
+					"2016"
+				]
+			}
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"name": "adls_landing_yh_region",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlmlabourmarket.dfs.core.windows.net/"
+		}
+	}
+}

@@ -1,0 +1,49 @@
+table dim_occupation
+	lineageTag: c605ff89-c121-45a8-9a43-9578bdd40166
+
+	column occupation_id
+		dataType: int64
+		formatString: 0
+		lineageTag: b78baa38-0425-46da-a52f-9f9abc1ef48d
+		summarizeBy: sum
+		sourceColumn: occupation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column ssyk_code
+		dataType: string
+		lineageTag: 13f49109-8dd8-41c5-bbac-e23264ed0691
+		summarizeBy: none
+		sourceColumn: ssyk_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column ssyk_name
+		dataType: string
+		lineageTag: b2ed7e96-b291-4cdc-a454-398147f96013
+		summarizeBy: none
+		sourceColumn: ssyk_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column jobtech_occupation_group_label
+		dataType: string
+		lineageTag: dbf370a7-1f14-42f8-97a0-22b853f4a06c
+		summarizeBy: none
+		sourceColumn: jobtech_occupation_group_label
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_occupation = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    dim_occupation_gold_analysis_labour_market_platform = Source{[Item="dim_occupation",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data]
+				in
+				    dim_occupation_gold_analysis_labour_market_platform
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,69 @@
+table fact_wages
+	lineageTag: 38a81a99-c81c-4a4c-a214-67c7ab712a1e
+
+	measure 'Average Wage SEK' = COALESCE(AVERAGE(fact_wages[monthly_salary_avg]), 0)
+		lineageTag: ecfa1030-a4e0-4bdd-9b9b-7ce2053fd897
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column date_id
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 80b43a2b-d950-4b17-bcc2-492cdf99998e
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column occupation_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 0399d8cd-17c2-4f6c-8281-809839820b64
+		summarizeBy: none
+		sourceColumn: occupation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column gender_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 94e59e38-620b-4543-9f73-372cfbcbdd7e
+		summarizeBy: none
+		sourceColumn: gender_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sector
+		dataType: string
+		lineageTag: e6bbbe21-fb10-48f9-803d-8df932f3a86a
+		summarizeBy: none
+		sourceColumn: sector
+
+		annotation SummarizationSetBy = Automatic
+
+	column monthly_salary_avg
+		dataType: double
+		lineageTag: 8db1548a-8315-445b-b16d-8e238e3c298e
+		summarizeBy: sum
+		sourceColumn: monthly_salary_avg
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition fact_wages = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    fact_wages_gold_analysis_labour_market_platform = Source{[Item="fact_wages",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data],
+				    #"Filtered Rows" = Table.SelectRows(fact_wages_gold_analysis_labour_market_platform, each ([monthly_salary_avg] <> null))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

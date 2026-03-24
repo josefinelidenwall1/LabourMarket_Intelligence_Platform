@@ -1,0 +1,9 @@
+{
+	"name": "adf-labour-market-intelligence",
+	"location": "swedencentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a44bfca1-dd1c-46ee-b937-d2f9b8863726",
+		"tenantId": "e9885073-5c41-4cad-84b0-174903b19bec"
+	}
+}

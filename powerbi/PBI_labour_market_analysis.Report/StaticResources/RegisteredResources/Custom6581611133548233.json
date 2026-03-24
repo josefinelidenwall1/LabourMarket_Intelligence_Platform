@@ -1,0 +1,82 @@
+{
+  "name": "Custom",
+  "textClasses": {
+    "label": {
+      "color": "#FDF3EB",
+      "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif"
+    },
+    "callout": {
+      "color": "#FFFFFF",
+      "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif"
+    },
+    "title": {
+      "color": "#FDF3EB",
+      "fontFace": "Georgia"
+    },
+    "header": {
+      "color": "#FDF3EB"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#679989"
+              }
+            }
+          }
+        ],
+        "outspacePane": [
+          {
+            "backgroundColor": {
+              "solid": {
+                "color": "#FDF3EB"
+              }
+            },
+            "checkboxAndApplyColor": {
+              "solid": {
+                "color": "#679989"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#679989"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FDF3EB"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "dataColors": [
+    "#FDF3EB",
+    "#3F5F48",
+    "#EDAA86",
+    "#679989",
+    "#6FA77E",
+    "#797979",
+    "#D9B300",
+    "#D64550"
+  ]
+}

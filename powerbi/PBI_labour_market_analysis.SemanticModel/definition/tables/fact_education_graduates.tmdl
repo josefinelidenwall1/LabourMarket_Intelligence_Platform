@@ -1,0 +1,218 @@
+table fact_education_graduates
+	lineageTag: e65d3b5a-a883-4b55-b50c-f8583e7688df
+
+	measure 'Total Graduates' = COALESCE(SUM(fact_education_graduates[student_count]), 0)
+		formatString: 0
+		lineageTag: 4eede845-6e26-485a-b7bf-90a1fc084747
+
+	measure 'Graduates YoY Growth %' = ```
+			
+			VAR CurrentYear = MAX('fact_education_graduates'[date_id]) -- Uses the year from the data itself
+			VAR PriorYear = CurrentYear - 1
+			
+			VAR CurrentValue = [Total Graduates]
+			VAR PriorValue = 
+			    CALCULATE(
+			        [Total Graduates], 
+			        REMOVEFILTERS('fact_education_graduates'[date_id]), 
+			        'fact_education_graduates'[date_id] = PriorYear
+			    )
+			
+			RETURN 
+			    DIVIDE(CurrentValue - PriorValue, PriorValue)
+			```
+		lineageTag: 6614d7e2-b05e-415e-b43c-15e0916a8507
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Top Subject' =
+			
+			MAXX(
+			  TOPN(1, VALUES(fact_education_graduates[subject]), [Total Graduates]),
+			  fact_education_graduates[subject]
+			)
+		lineageTag: 5657450e-f728-4bd7-8207-efc7d49da126
+
+	measure 'Top Region' =
+			
+			MAXX(
+			  TOPN(1, VALUES(dim_location[region_name]), [Total Graduates]),
+			  dim_location[region_name]
+			)
+		lineageTag: c8fad7ea-9be4-428a-9f92-3a6778d131fb
+
+	measure 'Fastest Growing Subject' = ```
+			
+			VAR StartYear = 2016
+			VAR EndYear = 2024
+			
+			-- Calculate growth for every subject in the current context
+			VAR SubjectGrowthTable = 
+			    GENERATE(
+			        VALUES('fact_Education_graduates'[subject]),
+			        VAR StartVal = CALCULATE(SUM('fact_Education_graduates'[student_count]), 'dim_date'[Year] = StartYear)
+			        VAR EndVal = CALCULATE(SUM('fact_Education_graduates'[student_count]), 'dim_date'[Year] = EndYear)
+			        RETURN ROW("GrowthPct", DIVIDE(EndVal - StartVal, StartVal))
+			    )
+			
+			-- Pick the top 1 by growth percentage
+			VAR TopSubject = 
+			    TOPN(1, SubjectGrowthTable, [GrowthPct], DESC)
+			
+			RETURN
+			    SELECTCOLUMNS(TopSubject, "subject", 'fact_Education_graduates'[subject])
+			```
+		lineageTag: e7be0928-f81b-4a64-b43a-55793846f610
+
+	measure 'Fastest Declining Subject' = ```
+			
+			VAR StartYear = 2016
+			VAR EndYear = 2024
+			VAR MinStudentThreshold = 100 -- Adjust this number based on your total data size
+			
+			VAR SubjectGrowthTable = 
+			    FILTER(
+			        GENERATE(
+			            VALUES('fact_education_graduates'[subject]),
+			            VAR StartVal = CALCULATE(SUM('fact_education_graduates'[student_count]), 'dim_date'[Year] = StartYear)
+			            VAR EndVal = CALCULATE(SUM('fact_education_graduates'[student_count]), 'dim_date'[Year] = EndYear)
+			            
+			            RETURN ROW(
+			                "StartCount", StartVal,
+			                "GrowthPct", DIVIDE(EndVal - StartVal, StartVal)
+			            )
+			        ),
+			        -- Rule 1: Must have been "popular" in 2016
+			        [StartCount] >= MinStudentThreshold && 
+			        -- Rule 2: Must actually have a growth/decline value
+			        NOT ISBLANK([GrowthPct])
+			    )
+			
+			-- Get the #1 most negative growth (ASC)
+			VAR TopSubjectTable = 
+			    TOPN(1, SubjectGrowthTable, [GrowthPct], ASC)
+			
+			RETURN
+			    MAXX(TopSubjectTable, 'fact_education_graduates'[subject])
+			```
+		lineageTag: 0cb6cb11-11bf-4344-be9b-cfb5558b1d45
+
+	measure 'Top 10 Trend' =
+			
+			VAR SubjectRank = RANKX(ALL('fact_education_graduates'[subject]), [Total Graduates], , DESC)
+			VAR YearsWithData = COUNTROWS(DISTINCT('fact_education_graduates'[Year Display]))
+			RETURN
+			-- Only show if it's Top 10 AND has more than 5 years of data
+			IF(SubjectRank <= 10 && YearsWithData > 5, [Total Graduates], BLANK())
+		formatString: 0
+		lineageTag: 0f002ee7-52d6-43bb-9278-038e02e118b8
+
+	measure '% Share of Graduates' = ```
+			
+			VAR TotalGrads = CALCULATE(SUM(fact_education_graduates[student_count]), ALLSELECTED(fact_education_graduates))
+			RETURN 
+			    DIVIDE(SUM(fact_education_graduates[student_count]), TotalGrads, 0)
+			```
+		lineageTag: 60612f6b-48cd-45dc-9cef-6b0ae1580846
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column date_id
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f68d375b-e5f9-4db4-aaaf-079ba66ca3e9
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column institution
+		dataType: string
+		lineageTag: 9f8316ac-235c-40f6-a4ff-487559110731
+		summarizeBy: none
+		sourceColumn: institution
+
+		annotation SummarizationSetBy = Automatic
+
+	column subject
+		dataType: string
+		lineageTag: a4ab3ca9-689d-45de-8c62-7a5373367aa3
+		summarizeBy: none
+		sourceColumn: subject
+
+		annotation SummarizationSetBy = Automatic
+
+	column gender_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 4086c4ab-b085-4007-a7e7-a6b87b97afb2
+		summarizeBy: none
+		sourceColumn: gender_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 583e62ad-4143-4f15-8459-e5c71b0f535b
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column student_count
+		dataType: int64
+		formatString: 0
+		lineageTag: b7e1901a-51b0-4125-9a85-d7592c391db2
+		summarizeBy: sum
+		sourceColumn: student_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column program_not_offered
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 873c6417-4141-404d-96e3-f1bfdebb3b06
+		summarizeBy: none
+		sourceColumn: program_not_offered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Institution Type' =
+			
+			IF(
+			  SEARCH("YH", fact_education_graduates[institution], , 0) > 0,
+			  "Yrkeshögskolan",
+			  "University"
+			)
+		lineageTag: ccd580cf-55c4-4706-8965-d48f35c45886
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Display' = YEAR(fact_education_graduates[date_id])
+		formatString: 0
+		lineageTag: dea3a382-0b5e-4b55-a420-8eb1c0d8cb73
+		summarizeBy: sum
+		sortByColumn: date_id
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_education_graduates = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    fact_education_graduates_gold_analysis_labour_market_platform = Source{[Item="fact_education_graduates",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data],
+				    #"Filtered Rows" = Table.SelectRows(fact_education_graduates_gold_analysis_labour_market_platform, each ([date_id] <> #date(2014, 1, 1) and [date_id] <> #date(2015, 1, 1)))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

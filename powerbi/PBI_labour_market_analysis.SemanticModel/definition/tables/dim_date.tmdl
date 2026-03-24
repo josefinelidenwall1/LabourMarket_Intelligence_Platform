@@ -1,0 +1,73 @@
+table dim_date
+	lineageTag: 63e4d7ef-05fc-48e6-9fd6-bf482504f604
+	dataCategory: Time
+
+	column date_id
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: bbc463d6-81ec-4f0d-bffc-57c75b8217c8
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 788cd9eb-22d3-4246-a78f-0cad368c714f
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: 3302ca3c-8a09-4761-a613-eb2b92b433fc
+		summarizeBy: sum
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 63e34d10-75c7-4539-acd5-125733448779
+		summarizeBy: sum
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column week
+		dataType: int64
+		formatString: 0
+		lineageTag: 9a54780a-1517-4e31-a0ce-8f0f14d7c09b
+		summarizeBy: sum
+		sourceColumn: week
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week
+		dataType: string
+		lineageTag: 7451fb55-aa49-47cf-bba4-14496c807f55
+		summarizeBy: none
+		sourceColumn: day_of_week
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    dim_date_gold_analysis_labour_market_platform = Source{[Item="dim_date",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data]
+				in
+				    dim_date_gold_analysis_labour_market_platform
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,11 @@
+{
+	"name": "ls_adls_landing",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlmlabourmarket.dfs.core.windows.net/"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

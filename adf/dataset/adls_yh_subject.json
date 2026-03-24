@@ -1,0 +1,20 @@
+{
+	"name": "adls_yh_subject",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adls_yh_inriktning",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "yh_edu_subject",
+				"folderPath": "raw/yh_education_subject",
+				"fileSystem": "landing"
+			}
+		},
+		"schema": {}
+	}
+}

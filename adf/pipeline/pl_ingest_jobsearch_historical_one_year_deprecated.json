@@ -1,0 +1,296 @@
+{
+	"name": "pl_ingest_jobsearch_historical_one_year_deprecated",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('v_has_more_pages'), false)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "web_get_historical_page",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "GET",
+								"url": {
+									"value": "@concat(\r\n  'https://historical.api.jobtechdev.se/search?q=',\r\n  pipeline().parameters.p_query,\r\n  '&published-after=',\r\n  pipeline().parameters.p_year,\r\n  '&published-before=',\r\n  string(add(int(pipeline().parameters.p_year),1)),\r\n  '&limit=',\r\n  string(pipeline().parameters.p_limit),\r\n  '&offset=',\r\n  string(variables('v_offset'))\r\n)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "web_get_historical_page",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_row_count",
+								"value": {
+									"value": "@length(activity('web_get_historical_page').output.hits)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_jobsearch_historical",
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": {
+											"value": "@concat(\n  '/search?q=',\n  pipeline().parameters.p_query,\n  '&published-after=',\n  pipeline().parameters.p_year,\n  '&published-before=',\n  string(add(int(pipeline().parameters.p_year),1)),\n  '&limit=',\n  string(pipeline().parameters.p_limit),\n  '&offset=',\n  string(variables('v_offset'))\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_landing_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"dirPath": {
+											"value": "@concat(\n  pipeline().parameters.p_target_folder,\n  '/year=',\n  pipeline().parameters.p_year\n)",
+											"type": "Expression"
+										},
+										"fileName": {
+											"value": "@concat('page_', string(variables('v_page_num')), '.json')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_has_more_pages",
+								"value": {
+									"value": "@equals(variables('v_row_count'), pipeline().parameters.p_limit)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable3",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_next_offset",
+								"value": {
+									"value": "@add(variables('v_offset'), pipeline().parameters.p_limit)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable4",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable3",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_offset",
+								"value": {
+									"value": "@variables('v_next_offset')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable5",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable4",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_next_page_number",
+								"value": {
+									"value": "@add(variables('v_page_num'), 1)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable6",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable5",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_page_num",
+								"value": {
+									"value": "@variables('v_next_page_number')",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"p_query": {
+				"type": "string"
+			},
+			"p_limit": {
+				"type": "int"
+			},
+			"p_target_folder": {
+				"type": "string"
+			},
+			"p_year": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"v_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_page_num": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_next_offset": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"v_next_page_number": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"v_has_more_pages": {
+				"type": "Boolean",
+				"defaultValue": true
+			},
+			"v_row_count": {
+				"type": "Integer",
+				"defaultValue": 0
+			}
+		},
+		"annotations": []
+	}
+}

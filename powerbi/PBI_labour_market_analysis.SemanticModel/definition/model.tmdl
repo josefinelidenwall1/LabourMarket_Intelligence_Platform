@@ -1,0 +1,30 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["dim_date","dim_gender","dim_occupation","fact_education_graduates","fact_job_postings","fact_wages","municipality_lan_lookup","dim_location","dim_occupation_ssyk","fact_employment","dim_occupation_major_group"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table dim_date
+ref table DateTableTemplate_426aff29-8379-4164-8fae-963ccea991e2
+ref table dim_gender
+ref table dim_occupation
+ref table fact_education_graduates
+ref table fact_job_postings
+ref table LocalDateTable_4dae9caa-3c78-40a2-8689-6716a8a7277a
+ref table fact_wages
+ref table municipality_lan_lookup
+ref table dim_location
+ref table dim_occupation_ssyk
+ref table fact_employment
+ref table dim_occupation_major_group
+
+ref cultureInfo en-US
+

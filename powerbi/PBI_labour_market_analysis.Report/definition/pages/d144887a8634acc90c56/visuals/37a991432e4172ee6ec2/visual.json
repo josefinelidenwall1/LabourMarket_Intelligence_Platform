@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "37a991432e4172ee6ec2",
+  "position": {
+    "x": 138.18008120372582,
+    "y": 155.29973728206355,
+    "z": 0,
+    "height": 139.40291378074994,
+    "width": 331.38762837353715,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Where is education failing to equip people for actual job market demands? What skills are employers in strong need of?"
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "What's the curriculum gap universities should fill?"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

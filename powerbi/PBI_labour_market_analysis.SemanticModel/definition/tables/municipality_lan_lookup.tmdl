@@ -1,0 +1,48 @@
+table municipality_lan_lookup
+	lineageTag: 03916ac0-87fb-4534-8446-29c5e018d941
+
+	column municipality_code
+		dataType: string
+		lineageTag: 0bfa7f73-7b62-420a-8c33-c2d2510badb3
+		summarizeBy: none
+		sourceColumn: municipality_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column lan_code
+		dataType: string
+		lineageTag: 33f7044b-f11e-441b-92ce-ca570bc3b716
+		summarizeBy: none
+		sourceColumn: lan_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column lan_name
+		dataType: string
+		lineageTag: 1ea941d4-500b-44d0-9c88-43eab63e7b25
+		summarizeBy: none
+		sourceColumn: lan_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column municipality_name
+		dataType: string
+		lineageTag: f0fdef11-6d93-43b2-a86a-1a83c0aea22f
+		summarizeBy: none
+		sourceColumn: municipality_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition municipality_lan_lookup = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    municipality_lan_lookup_gold_analysis_labour_market_platform = Source{[Item="municipality_lan_lookup",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data]
+				in
+				    municipality_lan_lookup_gold_analysis_labour_market_platform
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
