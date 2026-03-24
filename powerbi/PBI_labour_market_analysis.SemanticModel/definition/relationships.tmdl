@@ -1,0 +1,53 @@
+relationship 6af191fc-3020-41ee-9f72-fe048c620921
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_job_postings.application_deadline
+	toColumn: LocalDateTable_4dae9caa-3c78-40a2-8689-6716a8a7277a.Date
+
+relationship AutoDetected_3b1cde1b-247d-43ff-ad94-976398d82cae
+	fromColumn: fact_education_graduates.gender_id
+	toColumn: dim_gender.gender_id
+
+relationship AutoDetected_fd605fdc-68b5-4a76-b2e2-28cdef67d7fc
+	fromColumn: fact_wages.gender_id
+	toColumn: dim_gender.gender_id
+
+relationship AutoDetected_071ce34b-b4d1-40b0-872c-daff9eac69c8
+	fromColumn: fact_employment.gender_id
+	toColumn: dim_gender.gender_id
+
+relationship AutoDetected_a4a2bb82-edb9-4e0a-9a1c-ff696d9a726c
+	fromColumn: fact_job_postings.occupation_id
+	toColumn: dim_occupation_ssyk.occupation_id
+
+relationship AutoDetected_b37e4ef2-6af3-4e04-bcf1-2ad5e76534ad
+	fromColumn: fact_wages.occupation_id
+	toColumn: dim_occupation_ssyk.occupation_id
+
+relationship AutoDetected_424a058c-62df-4d4d-be4f-a99584d79064
+	fromColumn: fact_education_graduates.location_id
+	toColumn: dim_location.location_ID
+
+relationship AutoDetected_ccdaf410-c615-41b7-bb05-d39684e0ca83
+	fromColumn: fact_job_postings.location_ID
+	toColumn: dim_location.location_ID
+
+relationship c3419130-8f93-a0f6-4d99-d75831b5bf2f
+	fromColumn: fact_job_postings.date_id
+	toColumn: dim_date.date_id
+
+relationship d5927531-5242-6a89-fe9a-ddd7388b3d43
+	fromColumn: fact_education_graduates.date_id
+	toColumn: dim_date.date_id
+
+relationship ccc01172-9bae-baff-df89-407e473529a7
+	fromColumn: fact_employment.date_id
+	toColumn: dim_date.date_id
+
+relationship ec4a353e-21af-73b9-0252-bf93c3cd15da
+	fromColumn: fact_wages.date_id
+	toColumn: dim_date.date_id
+
+relationship AutoDetected_9fe1b10a-9e06-4735-8795-72085e3505a8
+	fromColumn: fact_employment.occupation_major_group_id
+	toColumn: dim_occupation_major_group.occupation_major_group_id
+

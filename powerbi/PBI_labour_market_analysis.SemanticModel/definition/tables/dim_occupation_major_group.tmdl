@@ -1,0 +1,44 @@
+table dim_occupation_major_group
+	lineageTag: 24720e15-3b57-424b-a518-da2d29eef5d7
+
+	column occupation_major_group_id
+		dataType: int64
+		formatString: 0
+		lineageTag: fc5d8f6d-7a5c-4822-9dec-3978bea5c0aa
+		summarizeBy: none
+		sourceColumn: occupation_major_group_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column occupation_code
+		dataType: string
+		lineageTag: aa07b88d-14d6-497f-ba1c-39f8d1737df6
+		summarizeBy: none
+		sourceColumn: occupation_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column occupation_group_name
+		dataType: string
+		lineageTag: e234fd5d-96ef-46b1-87cd-06d8abe69d8c
+		summarizeBy: none
+		sourceColumn: occupation_group_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_occupation_major_group = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", null),
+				    labour_market_platform_Database = Source{[Name="labour_market_platform",Kind="Database"]}[Data],
+				    gold_analysis_Schema = labour_market_platform_Database{[Name="gold_analysis",Kind="Schema"]}[Data],
+				    dim_occupation_major_group_Table = gold_analysis_Schema{[Name="dim_occupation_major_group",Kind="Table"]}[Data],
+				    #"Capitalized Each Word" = Table.TransformColumns(dim_occupation_major_group_Table,{{"occupation_group_name", Text.Proper, type text}})
+				in
+				    #"Capitalized Each Word"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
