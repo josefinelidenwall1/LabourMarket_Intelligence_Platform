@@ -74,6 +74,39 @@ custom_css = """
         color: #2E4E3C;
     }
 
+    /* Selectbox container */
+    div[data-baseweb="select"] > div {
+    background-color: #355C46 !important;
+    border: 1px solid #E6C3A5 !important;
+    border-radius: 10px;
+    }
+
+    /* Selected value text */
+    div[data-baseweb="select"] span {
+    color: #F7E9DC !important;
+    }
+
+    /* Dropdown arrow */
+    div[data-baseweb="select"] svg {
+    fill: #F7E9DC !important;
+    }
+
+    /* Dropdown menu (when opened) */
+    ul[role="listbox"] {
+    background-color: #355C46 !important;
+    border: 1px solid #E6C3A5 !important;
+    }
+
+    /* Dropdown options */
+    li[role="option"] {
+    color: #F7E9DC !important;
+    }
+
+    /* Hover effect on options */
+    li[role="option"]:hover {
+    background-color: rgba(127, 167, 154, 0.2) !important;
+    }
+
     /* Insight cards */
     .insight-card {
         background-color: rgba(230, 195, 165, 0.15);
@@ -94,6 +127,90 @@ custom_css = """
         font-size: 15px;
         color: #F7E9DC;
     }
+
+    /* =========================
+    SELECTBOX (Dropdown)
+    ========================= */
+
+    /* Main selectbox container */
+    div[data-baseweb="select"] > div {
+    background-color: #355C46 !important;
+    border: 2px solid #E6C3A5 !important;
+    border-radius: 10px;
+    cursor: pointer !important;  /* show pointer on hover */
+    }
+
+    /* Text inside selectbox */
+    div[data-baseweb="select"] span {
+    color: #F7E9DC !important;
+    }
+
+    /* Arrow icon */
+    div[data-baseweb="select"] svg {
+    fill: #F7E9DC !important;
+    }
+
+    /* Inner input fix */
+    div[data-baseweb="select"] input {
+    background-color: #355C46 !important;
+    color: #F7E9DC !important;
+    cursor: pointer !important;  /* pointer over input area too */
+    }
+
+    /* Make the whole selectbox area feel clickable */
+    div[data-baseweb="select"] * {
+    cursor: pointer !important;
+    }
+
+    /* =========================
+    DROPDOWN MENU (expanded)
+    ========================= */
+
+    /* Entire dropdown panel */
+    ul[role="listbox"] {
+    background-color: #355C46 !important;
+    border: 2px solid #E6C3A5 !important;
+    border-radius: 10px;
+    padding: 5px;
+    }
+
+    /* Each option */
+    li[role="option"] {
+    color: #F7E9DC !important;
+    background-color: #355C46 !important;
+    border-radius: 0px !important;;
+    cursor: pointer !important;
+    }
+
+    /* Hover effect removed: keep same appearance */
+    li[role="option"]:hover {
+    background-color: #355C46 !important;
+    color: #F7E9DC !important;
+    }
+
+    /* Selected option also keeps same appearance */
+    li[aria-selected="true"] {
+    background-color: #355C46 !important;
+    color: #F7E9DC !important;
+    }
+
+    /* =========================
+    DROPDOWN OUTER CONTAINER
+    ========================= */
+
+    /* BaseWeb popover (this is the outer wrapper causing the grey/white look) */
+    div[data-baseweb="popover"] {
+    background-color: transparent !important;
+    }
+
+    /* Inner container of dropdown */
+    div[data-baseweb="popover"] > div {
+    background-color: #355C46 !important;
+    border: 2px solid #E6C3A5 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    }
+
 </style>
 """
 
@@ -123,14 +240,137 @@ menu = st.sidebar.radio(
     ["Labour Market Analytics", "AI Planning Assistant"]  # Page options
 )
 
-st.caption("Supporting university program planning through real-time labour market intelligence")
+# st.caption("Supporting university program planning through real-time labour market intelligence")
 
 # Page routing logic
 # Based on what user selects in sidebar, show different content
 
 if menu == "Labour Market Analytics":
-    # This is the Analytics page
+    # Page title and short explanation
     st.header("Labour Market Analytics")
+    st.caption(
+        "Explore regional labour demand patterns to support university planning and program expansion."
+    )
+
+    # ---------------------------
+    # Filters section
+    # ---------------------------
+    # These are placeholder filters for now.
+    # Later, they can be connected to real data and query logic.
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        region = st.selectbox(
+            "Region",
+            ["All", "Stockholm", "Västra Götaland", "Skåne"]
+        )
+
+    with col2:
+        occupation_field = st.selectbox(
+            "Occupation Field",
+            ["All", "Data/IT", "Healthcare", "Education", "Engineering"]
+        )
+
+    with col3:
+        occupation_group = st.selectbox(
+            "Occupation Group",
+            ["All", "Software Developers", "Nurses", "Teachers", "Technicians"]
+        )
+
+    with col4:
+        year = st.selectbox(
+            "Year",
+            ["All", "2022", "2023", "2024", "2025"]
+        )
+
+    # ---------------------------
+    # KPI section
+    # ---------------------------
+    st.markdown("### Key Indicators")
+
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+
+    with kpi1:
+        st.metric("Total Demand Signals", "6.75M")
+
+    with kpi2:
+        st.metric("Leading Region", "Stockholm")
+
+    with kpi3:
+        st.metric("Top Occupation Group", "Software Developers")
+
+    with kpi4:
+        st.metric("Top Occupation Field", "Data/IT")
+
+    # ---------------------------
+    # Chart section
+    # ---------------------------
+    # These are placeholder charts for layout purposes.
+    # We will replace them with real data later.
+    st.markdown("### Market Signals")
+
+    chart1, chart2 = st.columns(2)
+
+    with chart1:
+        st.subheader("Regional Demand Hotspots")
+        st.bar_chart({
+            "Demand": [120, 95, 78, 65, 50]
+        })
+
+    with chart2:
+        st.subheader("Priority Occupation Areas")
+        st.bar_chart({
+            "Demand": [140, 110, 85, 70, 60]
+        })
+
+    # ---------------------------
+    # Insight cards section
+    # ---------------------------
+    st.markdown("### Planning Insights for Universities")
+
+    c1, c2, c3 = st.columns(3)
+
+    with c1:
+        st.markdown(
+            """
+            <div class="insight-card">
+                <div class="insight-title">Region to Watch</div>
+                <div class="insight-text">
+                    Västra Götaland shows sustained labour demand across technical and industrial roles,
+                    indicating strong regional planning relevance.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with c2:
+        st.markdown(
+            """
+            <div class="insight-card">
+                <div class="insight-title">Emerging Talent Need</div>
+                <div class="insight-text">
+                    Data and engineering-related occupations continue to show strong demand signals,
+                    suggesting future pressure on regional talent pipelines.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with c3:
+        st.markdown(
+            """
+            <div class="insight-card">
+                <div class="insight-title">Potential Program Opportunity</div>
+                <div class="insight-text">
+                    Universities may want to assess whether current program capacity aligns with growing
+                    employer demand in IT and engineering fields.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 elif menu == "AI Planning Assistant":
     # This is the AI Assistant page
