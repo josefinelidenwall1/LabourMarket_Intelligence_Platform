@@ -3,11 +3,12 @@ from dotenv import load_dotenv
 from openai import AzureOpenAI
 
 def load_environment_variables() -> dict:
-    load_dotenv()
+    load_dotenv(override=True)
     return {
         "db_host": os.getenv("DATABRICKS_SERVER_HOSTNAME"),
         "db_path": os.getenv("DATABRICKS_HTTP_PATH"),
-        "db_token": os.getenv("DATABRICKS_TOKEN"),
+        "db_client_id": os.getenv("DATABRICKS_CLIENT_ID"),         
+        "db_client_secret": os.getenv("DATABRICKS_CLIENT_SECRET"), 
         "oai_endpoint": os.getenv("AZURE_OPENAI_ENDPOINT"),
         "oai_key": os.getenv("AZURE_OPENAI_KEY"),
         "oai_deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
