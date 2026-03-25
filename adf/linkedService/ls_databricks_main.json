@@ -1,20 +1,13 @@
 {
 	"name": "ls_databricks_main",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "AzureDatabricks",
 		"typeProperties": {
 			"domain": "https://adb-7405617439098346.6.azuredatabricks.net",
-			"newClusterNodeType": "Standard_DS5_v2",
-			"newClusterNumOfWorker": "1",
-			"newClusterSparkEnvVars": {
-				"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
-			},
-			"newClusterVersion": "13.3.x-scala2.12",
-			"clusterOption": "Fixed",
-			"newClusterInitScripts": [],
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEZBNUJDMTEzLTk4NDItNEU0RC04ODA4LUVGQjBBMTEwNTYwRl8wMjVlNDU4NC0zYzU2LTRkNjEtYjU5Yy1jNzI1MmNmOTY1ZTciDQp9"
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/rg-labour-market-intelligence/providers/Microsoft.Databricks/workspaces/labour_market_platform"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
