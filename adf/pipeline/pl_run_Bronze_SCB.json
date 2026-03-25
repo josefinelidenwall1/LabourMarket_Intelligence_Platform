@@ -1,0 +1,34 @@
+{
+	"name": "pl_run_Bronze_SCB",
+	"properties": {
+		"activities": [
+			{
+				"name": "SCB_Bronze_Ingestion_Workforce_Data",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/fariba.kamani@skillio.ai/LabourMarket_Intelligence_Platform/SCB Bronze Ingestion Workforce Data"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_databricks_main",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"run_date": {
+				"type": "string",
+				"defaultValue": "@utcNow()"
+			}
+		},
+		"annotations": []
+	}
+}
