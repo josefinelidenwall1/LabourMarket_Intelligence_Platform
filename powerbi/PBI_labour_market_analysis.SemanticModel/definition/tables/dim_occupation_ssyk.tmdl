@@ -1,0 +1,63 @@
+table dim_occupation_ssyk
+	lineageTag: 6e212e55-b4d0-4350-b337-b21a4f46e403
+
+	column occupation_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 38986825-453d-4a61-8021-d4500a5dd899
+		summarizeBy: none
+		sourceColumn: occupation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column ssyk_code
+		dataType: string
+		lineageTag: 7a04dc41-0c44-46d8-9885-57126b5a6c8e
+		summarizeBy: none
+		sourceColumn: ssyk_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column ssyk_name
+		dataType: string
+		lineageTag: 1fbcf9f8-dd68-47f3-9c8c-ce39e316f045
+		summarizeBy: none
+		sourceColumn: ssyk_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSYK High Level' =
+			
+			VAR FirstDigit = LEFT('dim_occupation_ssyk'[ssyk_code], 1)
+			RETURN
+			SWITCH(FirstDigit,
+			    "1", "Managers",
+			    "2", "Specialists (Academic)",
+			    "3", "Associate Professionals (Tech/Health)",
+			    "4", "Administrative/Clerical",
+			    "5", "Service/Sales/Care",
+			    "6", "Agriculture/Forestry",
+			    "7", "Building/Manufacturing",
+			    "8", "Machine Operators",
+			    "9", "Elementary Occupations",
+			    "0", "Military",
+			    "Other"
+			)
+		lineageTag: a73d663c-7182-4b88-8837-8bc68c6ab473
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_occupation_ssyk = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    dim_occupation_ssyk_gold_analysis_labour_market_platform = Source{[Item="dim_occupation_ssyk",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data]
+				in
+				    dim_occupation_ssyk_gold_analysis_labour_market_platform
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

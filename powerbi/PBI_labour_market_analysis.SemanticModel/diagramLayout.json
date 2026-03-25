@@ -1,0 +1,165 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 46.769209724203108,
+        "y": 188.49409310318757
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1362.2216057865649,
+            "y": 760.09238485791559
+          },
+          "nodeIndex": "dim_date",
+          "nodeLineageTag": "63e4d7ef-05fc-48e6-9fd6-bf482504f604",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 1195.1827390422025,
+            "y": 286.71805903268228
+          },
+          "nodeIndex": "dim_gender",
+          "nodeLineageTag": "0fdab333-14ec-4acd-a737-eb6923e4befc",
+          "size": {
+            "height": 166.4937317206886,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 1392.9836383964289
+          },
+          "nodeIndex": "dim_occupation",
+          "nodeLineageTag": "c605ff89-c121-45a8-9a43-9578bdd40166",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 899.52807919998963,
+            "y": 350.79370089403443
+          },
+          "nodeIndex": "fact_education_graduates",
+          "nodeLineageTag": "e65d3b5a-a883-4b55-b50c-f8583e7688df",
+          "size": {
+            "height": 285.20278100000007,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 896.37367398573292,
+            "y": 855.97954330961409
+          },
+          "nodeIndex": "fact_job_postings",
+          "nodeLineageTag": "03916f3f-e3bf-49ff-bd2a-d324ef79fe98",
+          "size": {
+            "height": 404.522099,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 901.12733994201653,
+            "y": 645.850699392107
+          },
+          "nodeIndex": "fact_wages",
+          "nodeLineageTag": "38a81a99-c81c-4a4c-a214-67c7ab712a1e",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 240.095029219455,
+            "y": 1393.14041468594
+          },
+          "nodeIndex": "municipality_lan_lookup",
+          "nodeLineageTag": "03916ac0-87fb-4534-8446-29c5e018d941",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 455.61514880390246,
+            "y": 422.70478367003636
+          },
+          "nodeIndex": "dim_location",
+          "nodeLineageTag": "7ebae9b3-a33d-470c-a8f8-fc1ed80d4262",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 590.85908845055417,
+            "y": 834.50433089947148
+          },
+          "nodeIndex": "dim_occupation_ssyk",
+          "nodeLineageTag": "6e212e55-b4d0-4350-b337-b21a4f46e403",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 894.01884422972375,
+            "y": 162.26601817474113
+          },
+          "nodeIndex": "fact_employment",
+          "nodeLineageTag": "3fef7a9e-7311-442a-b0ba-47201f6d69d1",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 543.1032370211766,
+            "y": 185.41499583752292
+          },
+          "nodeIndex": "dim_occupation_major_group",
+          "nodeLineageTag": "24720e15-3b57-424b-a518-da2d29eef5d7",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 1
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 56.447393005377741,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

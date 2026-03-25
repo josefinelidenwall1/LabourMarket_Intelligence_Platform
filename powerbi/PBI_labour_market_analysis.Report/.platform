@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "PBI_labour_market_analysis"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7e09f4b0-8789-4438-8893-8c51f562be33"
+  }
+}

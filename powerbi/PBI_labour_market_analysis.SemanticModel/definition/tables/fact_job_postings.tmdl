@@ -1,0 +1,202 @@
+table fact_job_postings
+	lineageTag: 03916f3f-e3bf-49ff-bd2a-d324ef79fe98
+
+	measure 'Total Job Postings' = COALESCE(SUM(fact_job_postings[number_of_vacancies]), 0)
+		formatString: 0
+		lineageTag: 00fc59f0-2e67-4e32-9446-c8790b1ec863
+
+	measure 'Job Postings YoY Growth %' = ```
+			
+			VAR CurrentValue = [Total Job Postings]
+			VAR PriorValue = CALCULATE([Total Job Postings], SAMEPERIODLASTYEAR('dim_date'[date_id]))
+			RETURN 
+			    DIVIDE(CurrentValue - PriorValue, PriorValue, 0)
+			```
+		lineageTag: fbc8dcef-5e84-4ca1-910d-66c14cb19a0d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Most In-Demand Job' = ```
+			
+			SELECTCOLUMNS(
+			    TOPN(
+			        1, 
+			        ALLSELECTED('dim_occupation_ssyk'[ssyk_name]), 
+			        [Total Job Postings], 
+			        DESC
+			    ), 
+			    "JobName", 'dim_occupation_ssyk'[ssyk_name]
+			)
+			```
+		lineageTag: 16e23b18-0a3d-45a6-966a-4e991224d16b
+
+	measure 'Least In-Demand Job' = ```
+			
+			SELECTCOLUMNS(
+			    TOPN(
+			        1, 
+			        FILTER(
+			            ALLSELECTED('dim_occupation_ssyk'[ssyk_name]), 
+			            [Total Job Postings] > 0
+			        ), 
+			        [Total Job Postings], 
+			        ASC
+			    ), 
+			    "JobName", 'dim_occupation_ssyk'[ssyk_name]
+			)
+			```
+		lineageTag: e18acf11-fe02-477f-adea-80f306cbbaf1
+
+	measure '% Share of Vacancies' = ```
+			
+			VAR TotalVacancies = CALCULATE(SUM(fact_job_postings[number_of_vacancies]), ALLSELECTED(fact_job_postings))
+			RETURN 
+			    DIVIDE(SUM(fact_job_postings[number_of_vacancies]), TotalVacancies, 0)
+			```
+		lineageTag: 77f97622-0dc7-435f-87f5-0ba3f692582c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Market Gap Score' = [% Share of Vacancies] - [% Share of Graduates]
+		lineageTag: 3412918b-6b8a-4677-a562-be4f22826d84
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column job_id
+		dataType: string
+		lineageTag: 6710b06f-08de-4a5d-8f33-ef324216ccf4
+		summarizeBy: none
+		sourceColumn: job_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column occupation_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 5db387b1-54e2-4802-acfe-a39c65599391
+		summarizeBy: none
+		sourceColumn: occupation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 53184e91-882f-4600-8bbe-e5c2cef515c3
+		summarizeBy: none
+		sourceColumn: location_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_id
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 9e467802-9d2a-4927-b784-23f8b6c15268
+		summarizeBy: none
+		sourceColumn: date_id
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column number_of_vacancies
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e29e0d3-dea4-4602-b67e-cbeb057d0a3e
+		summarizeBy: sum
+		sourceColumn: number_of_vacancies
+
+		annotation SummarizationSetBy = Automatic
+
+	column scope_of_work_min
+		dataType: int64
+		formatString: 0
+		lineageTag: b363f7f9-443c-4d7f-b174-171047a8d0f2
+		summarizeBy: sum
+		sourceColumn: scope_of_work_min
+
+		annotation SummarizationSetBy = Automatic
+
+	column scope_of_work_max
+		dataType: int64
+		formatString: 0
+		lineageTag: 86487c1e-13b1-4ce1-82ac-5b7f47cd8d65
+		summarizeBy: sum
+		sourceColumn: scope_of_work_max
+
+		annotation SummarizationSetBy = Automatic
+
+	column application_deadline
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 269be3b1-9337-4552-9278-80ffbcee7a85
+		summarizeBy: none
+		sourceColumn: application_deadline
+
+		variation Variation
+			isDefault
+			relationship: 6af191fc-3020-41ee-9f72-fe048c620921
+			defaultHierarchy: LocalDateTable_4dae9caa-3c78-40a2-8689-6716a8a7277a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column employment_type_label
+		dataType: string
+		lineageTag: 635446b3-3099-47e7-889d-4f413fb54748
+		summarizeBy: none
+		sourceColumn: employment_type_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration_label
+		dataType: string
+		lineageTag: e23b4ea2-0aab-4cf8-b842-07db133900ea
+		summarizeBy: none
+		sourceColumn: duration_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column working_hours_type_label
+		dataType: string
+		lineageTag: 862a7c21-59f5-46bf-a143-9870e4a5dab4
+		summarizeBy: none
+		sourceColumn: working_hours_type_label
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_job_postings = m
+		mode: import
+		source =
+				let
+				    Source = Databricks.Catalogs("adb-7405617439098346.6.azuredatabricks.net", "/sql/1.0/warehouses/5bf990c8cb05ff5c", [Catalog="labour_market_platform", Database="gold_analysis", QueryTags=null, EnableAutomaticProxyDiscovery=null, Implementation=null]),
+				    fact_job_postings_gold_analysis_labour_market_platform = Source{[Item="fact_job_postings",Schema="gold_analysis",Catalog="labour_market_platform"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(fact_job_postings_gold_analysis_labour_market_platform,{{"application_deadline", type date}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type","VANLIG_ANSTALLNING","Vanlig anställning",Replacer.ReplaceText,{"employment_type_label"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","Sommarjobb / feriejobb","Sommarjobb",Replacer.ReplaceText,{"employment_type_label"}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","SOMMARJOBB","Sommarjobb",Replacer.ReplaceText,{"employment_type_label"}),
+				    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2","BEHOVSANSTALLNING","Behovsanställning",Replacer.ReplaceText,{"employment_type_label"}),
+				    #"Replaced Value4" = Table.ReplaceValue(#"Replaced Value3","ARBETE_UTOMLANDS","Arbete utomlands",Replacer.ReplaceText,{"employment_type_label"}),
+				    #"Replaced Value5" = Table.ReplaceValue(#"Replaced Value4","HELTID","Heltid",Replacer.ReplaceText,{"working_hours_type_label"}),
+				    #"Replaced Value6" = Table.ReplaceValue(#"Replaced Value5","DELTID","Deltid",Replacer.ReplaceText,{"working_hours_type_label"}),
+				    #"Replaced Value7" = Table.ReplaceValue(#"Replaced Value6","Tills vidare","Tillsvidare",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value8" = Table.ReplaceValue(#"Replaced Value7","TILLSVIDARE","Tillsvidare",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value9" = Table.ReplaceValue(#"Replaced Value8","SEX_MANADER_ELLER_LANGRE","Längre än 6 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value10" = Table.ReplaceValue(#"Replaced Value9","Längre än 6 månader","6 månader eller längre",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value11" = Table.ReplaceValue(#"Replaced Value10","3 månader - upp till 6 månader","3-6 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value12" = Table.ReplaceValue(#"Replaced Value11","ELVA_DAGAR_TILL_TRE_MANADER","11 dagar - 3 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value13" = Table.ReplaceValue(#"Replaced Value12","3 månader — upp till 6 månader","3-6 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value14" = Table.ReplaceValue(#"Replaced Value13","3 månader – upp till 6 månader","3-6 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value15" = Table.ReplaceValue(#"Replaced Value14","TRE_TILL_SEX_MANADER","3-6 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value16" = Table.ReplaceValue(#"Replaced Value15","11 dagar - upp till 3 månader","11 dagar - 3 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value17" = Table.ReplaceValue(#"Replaced Value16","3 - 6 månader","3-6 månader",Replacer.ReplaceText,{"duration_label"}),
+				    #"Replaced Value18" = Table.ReplaceValue(#"Replaced Value17","MAX_10_DAGAR","Max 10 dagar",Replacer.ReplaceText,{"duration_label"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Replaced Value18", each [occupation_id] <> null and [occupation_id] <> "")
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

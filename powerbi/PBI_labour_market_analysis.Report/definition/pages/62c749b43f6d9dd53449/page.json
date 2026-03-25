@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "62c749b43f6d9dd53449",
+  "displayName": "Labour Market Reality",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "d59f120846030950ce46",
+      "target": "fad2286c982b229bd6ea",
+      "type": "DataFilter"
+    }
+  ]
+}
