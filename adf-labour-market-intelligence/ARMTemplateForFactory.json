@@ -1541,6 +1541,74 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_master_weekly_refresh')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_master_monthly_historic_refresh')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "pl_ingest_jobtech_historical_full",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_ingest_jobtech_historical_full",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_jobtech_historical_full')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trg_ingest_historical_monthly')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_master_monthly_historic_refresh",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 4,
+						"startTime": "2026-03-29T15:00:00",
+						"timeZone": "W. Europe Standard Time",
+						"schedule": {
+							"weekDays": [
+								"Sunday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_master_monthly_historic_refresh')]"
+			]
 		}
 	]
 }
