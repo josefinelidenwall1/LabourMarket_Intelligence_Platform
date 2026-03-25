@@ -1,6 +1,6 @@
-import config
-import db_tools
-import ai_agents
+from . import config
+from . import db_tools
+from . import ai_agents
 
 def run_hybrid_rag_pipeline(user_question: str) -> dict:
     app_config = config.load_environment_variables()
