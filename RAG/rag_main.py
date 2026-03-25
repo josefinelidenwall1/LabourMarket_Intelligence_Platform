@@ -15,15 +15,11 @@ def run_hybrid_rag_pipeline(user_question: str) -> dict:
             "sql_query": sql_query,
             "final_answer": f"I encountered a database error: {sql_results[0]['error']}"
         }
-        
-    # Vector/Keyword Search
-    text_results = db_tools.retrieve_job_ad_text_context(user_question, llm_client, app_config)
     
     # LLM combination
     final_answer = ai_agents.generate_final_synthesis(
         question=user_question,
         sql_data=sql_results,
-        text_context=text_results,
         client=llm_client,
         config=app_config
     )
