@@ -51,7 +51,7 @@ Source file SCB edu_region is encoded in `ISO-8859-1` (Latin-1), important to ta
 | :--------------------------- | :-------- | :----------------------------------------------------------- |
 | `sector`                     | STRING    | The sector of the labor market (e.g., public, private).      |
 | `occupation_code`            | STRING    | The SSYK 2012 classification code for the profession.        |
-| `sex`                        | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).         |
+| `gender`                     | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).         |
 | `year`                       | STRING    | The reporting year.                                          |
 | `monthly_salary_avg`         | DOUBLE    | The average (mean) monthly salary.                           |
 | `salary_median`              | DOUBLE    | The median (50th percentile) monthly salary.                 |
@@ -74,7 +74,7 @@ Source file SCB edu_region is encoded in `ISO-8859-1` (Latin-1), important to ta
 | :------------------- | :-------- | :---------------------------------------------------------------------------- |
 | `attachment_code`    | STRING    | Degree of attachment to the labor market (e.g.,`ANSTTOT` for total employed). |
 | `occupation_code`    | STRING    | The SSYK 2012 classification code for the profession.                         |
-| `sex`                | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).                          |
+| `gender`             | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).                          |
 | `year`               | STRING    | The reporting year.                                                           |
 | `employed_thousands` | DOUBLE    | Number of employed persons, measured in thousands.                            |
 | `moe_thousands`      | DOUBLE    | Margin of error for the employed count (in thousands).                        |
@@ -87,7 +87,7 @@ Source file SCB edu_region is encoded in `ISO-8859-1` (Latin-1), important to ta
 | :------------------- | :-------- | :------------------------------------------------------------------------------------------ |
 | `region`             | STRING    | Geographic region code (`00` typically represents all of Sweden).                           |
 | `labour_status_code` | STRING    | Status in the labor market (e.g.,`TOTALT` for total population, `DAIR` for in labor force). |
-| `sex`                | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).                                        |
+| `gender`             | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).                                        |
 | `year`               | STRING    | The reporting year.                                                                         |
 | `pop_thousands`      | DOUBLE    | Population count for the given slice, measured in thousands.                                |
 | `moe_thousands`      | DOUBLE    | Margin of error for the population count (in thousands).                                    |
@@ -101,7 +101,7 @@ Source file SCB edu_region is encoded in `ISO-8859-1` (Latin-1), important to ta
 | Column Name          | Data Type | Description                                                     |
 | :------------------- | :-------- | :-------------------------------------------------------------- |
 | `labour_status_code` | STRING    | Status in the labor market (primarily `ALOS` for unemployed).   |
-| `sex`                | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).            |
+| `gender`             | STRING    | Gender code (`1` = Men, `2` = Women, `1+2` = Total).            |
 | `age_group`          | STRING    | The age bracket for the demographic (e.g.,`15-24`, `tot15-74`). |
 | `year`               | STRING    | The reporting year.                                             |
 | `unemp_thousands`    | DOUBLE    | Number of unemployed persons, measured in thousands.            |
