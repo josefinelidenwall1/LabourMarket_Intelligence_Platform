@@ -1,6 +1,6 @@
 import json
-import config
-from rag_main import run_hybrid_rag_pipeline
+from . import config
+from .rag_main import run_hybrid_rag_pipeline
 from databricks import sql
 from databricks.sdk.core import Config, oauth_service_principal
 

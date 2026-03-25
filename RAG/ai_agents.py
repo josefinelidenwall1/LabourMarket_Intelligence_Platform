@@ -1,6 +1,6 @@
 import json
 from openai import AzureOpenAI
-from schema_dictionary import TABLE_SCHEMA_PROMPT
+from .schema_dictionary import TABLE_SCHEMA_PROMPT
 
 def generate_sql_query(question: str, client: AzureOpenAI, config: dict) -> str:
     system_prompt = TABLE_SCHEMA_PROMPT
