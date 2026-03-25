@@ -23,6 +23,9 @@
 		"ls_http_jobtech_properties_typeProperties_url": {
 			"value": "https://data.jobtechdev.se"
 		},
+		"ls_https_scb_api_properties_typeProperties_url": {
+			"value": "https://api.scb.se/OV0104/v1/doris/en/ssd"
+		},
 		"ls_rest_jobsearch_current_properties_typeProperties_url": {
 			"value": "https://jobsearch.api.jobtechdev.se"
 		},

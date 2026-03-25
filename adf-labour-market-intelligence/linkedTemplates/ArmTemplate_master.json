@@ -31,6 +31,10 @@
 			"type": "string",
 			"defaultValue": "https://data.jobtechdev.se"
 		},
+		"ls_https_scb_api_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.scb.se/OV0104/v1/doris/en/ssd"
+		},
 		"ls_rest_jobsearch_current_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://jobsearch.api.jobtechdev.se"
@@ -83,6 +87,9 @@
 					},
 					"ls_http_jobtech_properties_typeProperties_url": {
 						"value": "[parameters('ls_http_jobtech_properties_typeProperties_url')]"
+					},
+					"ls_https_scb_api_properties_typeProperties_url": {
+						"value": "[parameters('ls_https_scb_api_properties_typeProperties_url')]"
 					},
 					"ls_rest_jobsearch_current_properties_typeProperties_url": {
 						"value": "[parameters('ls_rest_jobsearch_current_properties_typeProperties_url')]"

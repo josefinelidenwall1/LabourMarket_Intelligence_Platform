@@ -31,6 +31,10 @@
 			"type": "string",
 			"defaultValue": "https://data.jobtechdev.se"
 		},
+		"ls_https_scb_api_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.scb.se/OV0104/v1/doris/en/ssd"
+		},
 		"ls_rest_jobsearch_current_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://jobsearch.api.jobtechdev.se"
@@ -734,6 +738,68 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "copy_adls_zip_to_extracted_jsonl",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "copy_http_binary_to_adls",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings",
+												"compressionProperties": {
+													"type": "ZipDeflateReadSettings"
+												}
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_adls_jobtech_zip_source",
+											"type": "DatasetReference",
+											"parameters": {
+												"dirPath": "raw/arbetsformedlingen_historical",
+												"fileName": "@item().file_name"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_adls_jobtech_binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"folderPath": "raw/arbetsformedlingen_historical_extracted",
+												"fileName": "@concat(split(item().file_name, '_')[0], '.enriched.jsonl')"
+											}
+										}
+									]
 								}
 							]
 						}
@@ -798,7 +864,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_http_jobtech_binary')]",
-				"[concat(variables('factoryId'), '/datasets/ds_adls_jobtech_binary')]"
+				"[concat(variables('factoryId'), '/datasets/ds_adls_jobtech_binary')]",
+				"[concat(variables('factoryId'), '/datasets/ds_adls_jobtech_zip_source')]"
 			]
 		},
 		{
@@ -926,6 +993,39 @@
 				"[concat(variables('factoryId'), '/datasets/adls_yh_region_csv')]",
 				"[concat(variables('factoryId'), '/datasets/http_yh_inriktning')]",
 				"[concat(variables('factoryId'), '/datasets/adls_yh_subject')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_master_weekly_refresh')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "pl_ingest_jobsearch_current_loop",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_ingest_jobsearch_current_loop",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_ingest_jobsearch_current_loop')]"
 			]
 		},
 		{
@@ -1061,6 +1161,47 @@
 							"type": "Expression"
 						},
 						"fileSystem": "landing"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_landing')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_jobtech_zip_source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_landing",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"dirPath": {
+						"type": "string"
+					},
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().dirPath",
+							"type": "Expression"
+						},
+						"fileSystem": "landing"
+					},
+					"compression": {
+						"type": "ZipDeflate"
 					}
 				}
 			},
@@ -1286,6 +1427,21 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ls_databricks_main')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405617439098346.6.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/rg-labour-market-intelligence/providers/Microsoft.Databricks/workspaces/labour_market_platform"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ls_http_jobtech')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1294,6 +1450,21 @@
 				"type": "HttpServer",
 				"typeProperties": {
 					"url": "[parameters('ls_http_jobtech_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_https_scb_api')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_https_scb_api_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
 				}
@@ -1329,6 +1500,47 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trg_ingest_current_weekly')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pl_master_weekly_refresh",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 1,
+						"startTime": "2026-03-29T10:00:00",
+						"timeZone": "W. Europe Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								10
+							],
+							"weekDays": [
+								"Sunday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_master_weekly_refresh')]"
+			]
 		}
 	]
 }

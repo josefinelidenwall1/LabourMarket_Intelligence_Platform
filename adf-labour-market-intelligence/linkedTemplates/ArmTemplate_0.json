@@ -31,6 +31,10 @@
 			"type": "string",
 			"defaultValue": "https://data.jobtechdev.se"
 		},
+		"ls_https_scb_api_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.scb.se/OV0104/v1/doris/en/ssd"
+		},
 		"ls_rest_jobsearch_current_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://jobsearch.api.jobtechdev.se"
@@ -114,6 +118,21 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ls_databricks_main')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405617439098346.6.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/23b183d5-a30f-46b8-b418-ad060fb67787/resourceGroups/rg-labour-market-intelligence/providers/Microsoft.Databricks/workspaces/labour_market_platform"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ls_http_jobtech')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -122,6 +141,21 @@
 				"type": "HttpServer",
 				"typeProperties": {
 					"url": "[parameters('ls_http_jobtech_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_https_scb_api')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_https_scb_api_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
 				}
@@ -299,6 +333,47 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_jobtech_zip_source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_landing",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"dirPath": {
+						"type": "string"
+					},
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().dirPath",
+							"type": "Expression"
+						},
+						"fileSystem": "landing"
+					},
+					"compression": {
+						"type": "ZipDeflate"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_landing')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_adls_landing_json')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -421,562 +496,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_rest_jobsearch_historical')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/http_yh_inriktning')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Http_yh_inriktning",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation"
-					},
-					"encodingName": "ISO-8859-1"
-				},
-				"schema": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Http_yh_inriktning')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_ingest_jobsearch_current_loop')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "until_fetch_page",
-						"type": "Until",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@greater(variables('v_page_num'), pipeline().parameters.p_max_pages)",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "copy_current_jobsearch_page",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "JsonSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "JsonWriteSettings"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_rest_jobsearch_current",
-											"type": "DatasetReference",
-											"parameters": {
-												"relativeUrl": {
-													"value": "@concat('/search?q=', pipeline().parameters.p_query,\n        '&limit=', string(pipeline().parameters.p_limit),\n        '&offset=', string(variables('v_offset')))",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_adls_landing_json",
-											"type": "DatasetReference",
-											"parameters": {
-												"dirPath": {
-													"value": "@pipeline().parameters.p_target_folder",
-													"type": "Expression"
-												},
-												"fileName": {
-													"value": "@concat('page_', string(variables('v_page_num')), '.json')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "set_next_offset",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "copy_current_jobsearch_page",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_next_offset",
-										"value": {
-											"value": "@add(variables('v_offset'), pipeline().parameters.p_limit)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "set_offset",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "set_next_offset",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_offset",
-										"value": {
-											"value": "@variables('v_next_offset')",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "set_next_page",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "set_offset",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_next_page_num",
-										"value": {
-											"value": "@add(variables('v_page_num'), 1)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "set_page_num",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "set_next_page",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_page_num",
-										"value": {
-											"value": "@variables('v_next_page_num')",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"timeout": "0.12:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"p_query": {
-						"type": "string",
-						"defaultValue": "data"
-					},
-					"p_limit": {
-						"type": "int",
-						"defaultValue": 100
-					},
-					"p_target_folder": {
-						"type": "string",
-						"defaultValue": "raw/arbetsformedlingen_current"
-					},
-					"p_max_pages": {
-						"type": "int",
-						"defaultValue": 3
-					}
-				},
-				"variables": {
-					"v_offset": {
-						"type": "Integer",
-						"defaultValue": 0
-					},
-					"v_page_num": {
-						"type": "Integer",
-						"defaultValue": 1
-					},
-					"v_next_offset": {
-						"type": "Integer",
-						"defaultValue": 0
-					},
-					"v_next_page_num": {
-						"type": "Integer",
-						"defaultValue": 1
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2026-03-17T12:45:07Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_rest_jobsearch_current')]",
-				"[concat(variables('factoryId'), '/datasets/ds_adls_landing_json')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_ingest_jobsearch_historical_one_year_deprecated')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Until1",
-						"type": "Until",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(variables('v_has_more_pages'), false)",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "web_get_historical_page",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"headers": {},
-										"url": {
-											"value": "@concat(\r\n  'https://historical.api.jobtechdev.se/search?q=',\r\n  pipeline().parameters.p_query,\r\n  '&published-after=',\r\n  pipeline().parameters.p_year,\r\n  '&published-before=',\r\n  string(add(int(pipeline().parameters.p_year),1)),\r\n  '&limit=',\r\n  string(pipeline().parameters.p_limit),\r\n  '&offset=',\r\n  string(variables('v_offset'))\r\n)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable1",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "web_get_historical_page",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_row_count",
-										"value": {
-											"value": "@length(activity('web_get_historical_page').output.hits)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Set variable1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "JsonSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "JsonWriteSettings"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_rest_jobsearch_historical",
-											"type": "DatasetReference",
-											"parameters": {
-												"relativeUrl": {
-													"value": "@concat(\n  '/search?q=',\n  pipeline().parameters.p_query,\n  '&published-after=',\n  pipeline().parameters.p_year,\n  '&published-before=',\n  string(add(int(pipeline().parameters.p_year),1)),\n  '&limit=',\n  string(pipeline().parameters.p_limit),\n  '&offset=',\n  string(variables('v_offset'))\n)",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_adls_landing_json",
-											"type": "DatasetReference",
-											"parameters": {
-												"dirPath": {
-													"value": "@concat(\n  pipeline().parameters.p_target_folder,\n  '/year=',\n  pipeline().parameters.p_year\n)",
-													"type": "Expression"
-												},
-												"fileName": {
-													"value": "@concat('page_', string(variables('v_page_num')), '.json')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Set variable2",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Copy data1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_has_more_pages",
-										"value": {
-											"value": "@equals(variables('v_row_count'), pipeline().parameters.p_limit)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable3",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Set variable2",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_next_offset",
-										"value": {
-											"value": "@add(variables('v_offset'), pipeline().parameters.p_limit)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable4",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Set variable3",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_offset",
-										"value": {
-											"value": "@variables('v_next_offset')",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable5",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Set variable4",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_next_page_number",
-										"value": {
-											"value": "@add(variables('v_page_num'), 1)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable6",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Set variable5",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "v_page_num",
-										"value": {
-											"value": "@variables('v_next_page_number')",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"timeout": "0.12:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"p_query": {
-						"type": "string"
-					},
-					"p_limit": {
-						"type": "int"
-					},
-					"p_target_folder": {
-						"type": "string"
-					},
-					"p_year": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"v_offset": {
-						"type": "Integer",
-						"defaultValue": 0
-					},
-					"v_page_num": {
-						"type": "Integer",
-						"defaultValue": 1
-					},
-					"v_next_offset": {
-						"type": "Integer",
-						"defaultValue": 0
-					},
-					"v_next_page_number": {
-						"type": "Integer",
-						"defaultValue": 1
-					},
-					"v_has_more_pages": {
-						"type": "Boolean",
-						"defaultValue": true
-					},
-					"v_row_count": {
-						"type": "Integer",
-						"defaultValue": 0
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_rest_jobsearch_historical')]",
-				"[concat(variables('factoryId'), '/datasets/ds_adls_landing_json')]"
 			]
 		}
 	]
