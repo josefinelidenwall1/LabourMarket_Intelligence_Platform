@@ -17,22 +17,6 @@
 					},
 					"waitOnCompletion": true
 				}
-			},
-			{
-				"name": "pl_ingest_jobtech_historical_full",
-				"type": "ExecutePipeline",
-				"dependsOn": [],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "pl_ingest_jobtech_historical_full",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
 			}
 		],
 		"annotations": []
