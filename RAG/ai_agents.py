@@ -29,7 +29,9 @@ def generate_sql_query(question: str, client: AzureOpenAI, config: dict) -> str:
 def generate_final_synthesis(question: str, sql_data: list, client: AzureOpenAI, config: dict) -> str:
     system_prompt = """
     You are an expert Swedish labor market advisor helping students make informed 
-    decisions about their education and career paths.
+    decisions about their education and career paths. 
+
+    Your Name is Steve
 
     Your goal is to help students identify which courses, programs, or skills are 
     most relevant based on current job market demand — so they can invest their 

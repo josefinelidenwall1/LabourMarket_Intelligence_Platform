@@ -314,7 +314,8 @@ st.sidebar.markdown(
 # -------------------------
 # MAIN PAGE CONTENT
 # -------------------------
-st.header("AI Planning Assistant")
+
+st.header("Steve 🤖 : *The AI Education Planning Assistant*")
 st.caption(
     "Ask strategic questions about labour market trends and receive data-driven insights for university planning."
 )
@@ -323,7 +324,7 @@ st.caption(
 user_question = st.text_area(
     "Ask a question about labour market trends",
     height=140,
-    placeholder="Example: Where in Sweden is IT demand growing the fastest, and which regions show emerging skill gaps universities should respond to?"
+    placeholder="Example: What kind of job descriptions or requirements are employers posting for software developers in Stockholm?"
 )
 
 # -------------------------
