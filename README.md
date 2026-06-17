@@ -33,10 +33,12 @@ We processed the data using an ELT workflow structured around a **Medallion Arch
 ## 💾 Data Modeling Challenges
 To allow our education and job posting tables to cross-reference accurately, we designed a unified Star Schema that addresses several data integration hurdles:
 
-* **The Problems:** * **Unstructured Job Titles:** Job ads rely on free-text, non-standardized titles, whereas SCB and Arbetsförmedlingen use strict occupational codes at varying levels of granularity (broad groups vs. specific occupations).
+* **The Problems:**
+  * **Unstructured Job Titles:** Job ads rely on free-text, non-standardized titles, whereas SCB and Arbetsförmedlingen use strict occupational codes at varying levels of granularity (broad groups vs. specific occupations).
   * **Mismatched Education Frameworks:** Education data uses completely different subject categories depending on whether it comes from traditional universities or **Yrkeshögskolan** (higher vocational education), making direct comparisons difficult.
   * **Geographic Discrepancies:** Location data from Arbetsförmedlingen and UKÄ mapped to different regional levels—some recorded at the municipality (*kommun*) level and others at the county (*län*) level.
-* **Our Solution:** * We separated aggregate employment data into a higher-level table (`dim_occupation_major_group`) while maintaining granular job posting details in a specific occupational dimension (`dim_occupation_ssyk`). 
+* **Our Solution:**
+  * We separated aggregate employment data into a higher-level table (`dim_occupation_major_group`) while maintaining granular job posting details in a specific occupational dimension (`dim_occupation_ssyk`). 
   * We built a geographic mapping table to normalize municipalities into their respective counties. This standardizes the location data across the board, enabling clean labor market and education comparisons for every *län* in Sweden.
 
 ---
